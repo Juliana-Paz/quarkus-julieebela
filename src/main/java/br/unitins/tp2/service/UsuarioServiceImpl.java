@@ -4,10 +4,10 @@ import java.util.List;
 
 import br.unitins.tp2.dto.UsuarioDTO;
 import br.unitins.tp2.dto.UsuarioResponseDTO;
+import br.unitins.tp2.exception.ValidationException;
 import br.unitins.tp2.model.Perfil;
 import br.unitins.tp2.model.Usuario;
 import br.unitins.tp2.repository.UsuarioRepository;
-import br.unitins.tp2.validation.ValidationException;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -22,7 +22,7 @@ public class UsuarioServiceImpl implements UsuarioService {
     @Transactional
     public UsuarioResponseDTO insert(UsuarioDTO dto) {
         if (repository.findByUsername(dto.username()) != null) {
-            throw new ValidationException("username", "O username informado já existe, informe outro username.");
+            throw  ValidationException.of("username", "O username informado já existe, informe outro username.");
         }
         Usuario novoUsuario = new Usuario();
         novoUsuario.setUsername(dto.username());

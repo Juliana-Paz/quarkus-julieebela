@@ -14,6 +14,7 @@ public final class EstadoDTO {
     @Length(min = 2, max = 2, message = "A sigla deve ter 2 caracteres.")
     private final String sigla;
 
+    @NotNull(message = "O idRegiao deve ser informado (back).")
     private final Long idRegiao;
 
     public EstadoDTO(String nome, String sigla, Long idRegiao) {
