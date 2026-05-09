@@ -35,3 +35,19 @@ INSERT INTO aluno_telefone (id_aluno, codigo_area, numero) VALUES (4, '11', '955
 INSERT INTO aluno_telefone (id_aluno, codigo_area, numero) VALUES (5, '21', '944444444');
 INSERT INTO aluno_telefone (id_aluno, codigo_area, numero) VALUES (5, '63', '933333333');
 
+-- Planos
+INSERT INTO plano (dataCadastro, dataAlteracao, nome, max_alunos, max_professores, preco_mensal, desconto_anual)
+VALUES (NOW(), NULL, 'Plano Basico', 100, 20, 99.90, 5.0);
+
+INSERT INTO plano (dataCadastro, dataAlteracao, nome, max_alunos, max_professores, preco_mensal, desconto_anual)
+VALUES (NOW(), NULL, 'Plano Essencial', 250, 40, 179.90, 8.0);
+
+INSERT INTO plano (dataCadastro, dataAlteracao, nome, max_alunos, max_professores, preco_mensal, desconto_anual)
+VALUES (NOW(), NULL, 'Plano Profissional', 500, 80, 299.90, 10.0);
+
+INSERT INTO plano (dataCadastro, dataAlteracao, nome, max_alunos, max_professores, preco_mensal, desconto_anual)
+VALUES (NOW(), NULL, 'Plano Premium', 1000, 150, 499.90, 12.0);
+
+INSERT INTO plano (dataCadastro, dataAlteracao, nome, max_alunos, max_professores, preco_mensal, desconto_anual)
+VALUES (NOW(), NULL, 'Plano Enterprise', 2500, 400, 899.90, 15.0);
+

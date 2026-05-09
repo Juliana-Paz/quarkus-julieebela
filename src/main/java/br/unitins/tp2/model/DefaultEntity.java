@@ -19,6 +19,7 @@ public class DefaultEntity {
     private LocalDateTime dataCadastro;
 
     private LocalDateTime dataAlteracao;
+    
 
     @PrePersist
     public void registrarDataCadastro() {

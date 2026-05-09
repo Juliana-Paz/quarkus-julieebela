@@ -1,14 +1,14 @@
 package br.unitins.tp2.resource;
 
-import java.io.IOException;
 import java.net.URI;
+import java.io.IOException;
 
 import org.jboss.resteasy.reactive.RestForm;
 import org.jboss.resteasy.reactive.multipart.FileUpload;
 
 import br.unitins.tp2.dto.PlanoDTO;
 import br.unitins.tp2.dto.PlanoResponseDTO;
-import br.unitins.tp2.service.FileService;
+import br.unitins.tp2.service.ArquivoDownload;
 import br.unitins.tp2.service.PlanoFileServiceImpl;
 import br.unitins.tp2.service.PlanoService;
 import jakarta.inject.Inject;
@@ -112,11 +112,12 @@ public class PlanoResource {
     }
 
     @GET
-    @Path("/image/download/{nomeImagem}")
+    @Path("/image/download/{fid}")
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
-    public Response download(@PathParam("nomeImagem") String nomeImagem) {
-        ResponseBuilder response = Response.ok(fileService.download(nomeImagem));
-        response.header("Content-Disposition", "attachment;filename=" + nomeImagem);
+    public Response download(@PathParam("fid") String fid) {
+        ArquivoDownload download = fileService.download(fid);
+        ResponseBuilder response = Response.ok(download.content(), download.contentType());
+        response.header("Content-Disposition", "attachment; filename=\"" + download.fileName().replace("\"", "") + "\"");
         return response.build();
     }
 
@@ -140,5 +141,12 @@ public class PlanoResource {
             return Response.status(Status.CONFLICT).build();
         }
 
+    }
+
+    @DELETE
+    @Path("/image/{fid}")
+    public Response removerImagem(@PathParam("fid") String fid) {
+        fileService.remover(fid);
+        return Response.noContent().build();
     }
 }

@@ -87,8 +87,11 @@ public class PlanoServiceImpl implements PlanoService {
 
     /** Copia/normaliza os campos do DTO para a entidade. */
     private void apply(PlanoDTO dto, Plano entity) {
-        // Texto comum: apenas trim
         entity.setNome(safeTrim(dto.nome()));
+        entity.setMaxAlunos(dto.maxAlunos());
+        entity.setMaxProfessores(dto.maxProfessores());
+        entity.setPrecoMensal(dto.precoMensal());
+        entity.setDescontoAnual(dto.descontoAnual());
     }
 
     /** Remove espaços laterais, preservando null. */
@@ -96,8 +99,4 @@ public class PlanoServiceImpl implements PlanoService {
         return s == null ? null : s.trim();
     }
 
-    /** Mantém apenas dígitos (remove espaços, pontos, traços, parênteses etc.). */
-    private String normalizeDigits(String s) {
-        return (s == null) ? null : s.replaceAll("\\D", "");
-    }
 }

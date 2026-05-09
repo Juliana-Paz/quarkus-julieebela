@@ -1,5 +1,7 @@
 package br.unitins.tp2.repository;
 
+import java.util.Optional;
+
 import br.unitins.tp2.model.Plano;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
@@ -21,6 +23,10 @@ public class PlanoRepository implements PanacheRepository<Plano> {
 
     public long countNome(String nome) {
         return count("UPPER(nome) LIKE ?1 ", "%" + nome.toUpperCase() + "%");
+    }
+
+    public Optional<Plano> findByArquivoId(Long arquivoId) {
+        return find("SELECT p FROM Plano p JOIN p.arquivos a WHERE a.id = ?1", arquivoId).firstResultOptional();
     }
 
 }

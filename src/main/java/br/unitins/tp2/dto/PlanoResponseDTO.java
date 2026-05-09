@@ -1,5 +1,7 @@
 package br.unitins.tp2.dto;
 
+import java.util.List;
+
 import br.unitins.tp2.model.Plano;
 
 public record PlanoResponseDTO(
@@ -9,7 +11,7 @@ public record PlanoResponseDTO(
     Integer maxProfessores,
     Double precoMensal,
     Double descontoAnual,
-    String nomeImagem
+    List<ArquivoResponseDTO> imagens
     ) {
 
 public static PlanoResponseDTO valueOf(Plano plano) {
@@ -20,7 +22,7 @@ public static PlanoResponseDTO valueOf(Plano plano) {
         plano.getMaxProfessores(),
         plano.getPrecoMensal(),
         plano.getDescontoAnual(),
-        plano.getNomeImagem()
+        plano.getArquivos().stream().map(ArquivoResponseDTO::valueOf).toList()
     );
 }
 

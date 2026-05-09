@@ -1,7 +1,15 @@
 package br.unitins.tp2.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.OneToMany;
 
 @Entity
 public class Plano extends DefaultEntity {
@@ -21,8 +29,9 @@ public class Plano extends DefaultEntity {
     @Column(nullable = false, name = "desconto_anual")
     private Double descontoAnual;
 
-    @Column(nullable = true, name = "nome_imagem")
-    private String nomeImagem;
+    @OneToMany(fetch = FetchType.EAGER, orphanRemoval = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+    @JoinTable(name = "plano_arquivo", joinColumns = @JoinColumn(name = "plano_id"), inverseJoinColumns = @JoinColumn(name = "arquivo_id", unique = true))
+    private List<Arquivo> arquivos = new ArrayList<>();
 
     public String getNome() {
         return nome;
@@ -64,12 +73,26 @@ public class Plano extends DefaultEntity {
         this.descontoAnual = descontoAnual;
     }
 
-    public String getNomeImagem() {
-        return nomeImagem;
+    public List<Arquivo> getArquivos() {
+        return arquivos;
     }
 
-    public void setNomeImagem(String nomeImagem) {
-        this.nomeImagem = nomeImagem;
+    public void setArquivos(List<Arquivo> arquivos) {
+        this.arquivos = arquivos;
+    }
+
+    public void addArquivo(Arquivo arquivo) {
+        if (arquivo == null) {
+            return;
+        }
+        arquivos.add(arquivo);
+    }
+
+    public void removeArquivo(Arquivo arquivo) {
+        if (arquivo == null) {
+            return;
+        }
+        arquivos.remove(arquivo);
     }
 
 }

@@ -1,0 +1,21 @@
+services:
+  seaweedfs-master:
+    image: chrislusf/seaweedfs:latest
+    container_name: seaweedfs-master
+    command: "master -ip=seaweedfs-master -port=9333"
+    ports:
+      - "9333:9333"
+
+  seaweedfs-volume:
+    image: chrislusf/seaweedfs:latest
+    container_name: seaweedfs-volume
+    depends_on:
+      - seaweedfs-master
+    command: "volume -mserver=seaweedfs-master:9333 -ip=seaweedfs-volume -port=8080 -publicUrl=localhost:8088 -dir=/data"
+    ports:
+      - "8088:8080"
+    volumes:
+      - seaweedfs_data:/data
+
+volumes:
+  seaweedfs_data:
