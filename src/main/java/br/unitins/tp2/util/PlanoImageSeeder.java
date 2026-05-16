@@ -23,6 +23,9 @@ public class PlanoImageSeeder {
 
     void onStart(@Observes @Priority(3000) StartupEvent event) {
         salvarImagem(1L, "images/PlanoBasico.png");
+        salvarImagem(2L, "images/PlanoBasico.png");
+        salvarImagem(3L, "images/PlanoBasico.png");
+        salvarImagem(4L, "images/PlanoBasico.png");
         salvarImagem(5L, "images/PlanoEnterprise.png");
     }
 

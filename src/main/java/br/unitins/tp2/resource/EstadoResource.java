@@ -5,6 +5,7 @@ import java.util.List;
 import br.unitins.tp2.dto.EstadoDTO;
 import br.unitins.tp2.model.Estado;
 import br.unitins.tp2.service.EstadoService;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
@@ -52,6 +53,7 @@ public class EstadoResource {
     }
 
     @POST
+    @RolesAllowed("user")
     public Estado incluir(EstadoDTO dto) {
         return service.create(dto);
     }
