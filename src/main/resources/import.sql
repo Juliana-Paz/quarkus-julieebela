@@ -51,3 +51,9 @@ VALUES (NOW(), NULL, 'Plano Premium', 1000, 150, 499.90, 12.0);
 INSERT INTO plano (dataCadastro, dataAlteracao, nome, max_alunos, max_professores, preco_mensal, desconto_anual)
 VALUES (NOW(), NULL, 'Plano Enterprise', 2500, 400, 899.90, 15.0);
 
+-- Usuarios
+INSERT INTO usuario (dataCadastro, dataAlteracao, nome, username, senha, perfil)
+VALUES (NOW(), NULL, 'Administrador', 'admin', '0cctg7WgpEz7kC/AzVC+KX+bZLPXDtgJDqWWZWnmzHH+7Na2YVxYYSFPxcf7ImAjqfNckx0aT4n5qKM7WEoeEQ==', 1);
+
+INSERT INTO usuario (dataCadastro, dataAlteracao, nome, username, senha, perfil)
+VALUES (NOW(), NULL, 'Carlos Henrique', 'carlos', '0cctg7WgpEz7kC/AzVC+KX+bZLPXDtgJDqWWZWnmzHH+7Na2YVxYYSFPxcf7ImAjqfNckx0aT4n5qKM7WEoeEQ==', 2);

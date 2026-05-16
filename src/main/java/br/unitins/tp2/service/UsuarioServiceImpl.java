@@ -25,6 +25,7 @@ public class UsuarioServiceImpl implements UsuarioService {
             throw  ValidationException.of("username", "O username informado já existe, informe outro username.");
         }
         Usuario novoUsuario = new Usuario();
+        novoUsuario.setNome(dto.nome());
         novoUsuario.setUsername(dto.username());
         novoUsuario.setSenha(dto.senha());
         novoUsuario.setPerfil(Perfil.valueOf(dto.idPerfil()));
@@ -65,6 +66,12 @@ public class UsuarioServiceImpl implements UsuarioService {
     @Override
     public UsuarioResponseDTO findByLoginAndSenha(String login, String senha) {
         Usuario usuario = repository.findByUsernameAndSenha(login, senha);
+        return UsuarioResponseDTO.valueOf(usuario);
+    }
+
+    @Override
+    public UsuarioResponseDTO findByUsername(String username) {
+        Usuario usuario = repository.findByUsername(username);
         return UsuarioResponseDTO.valueOf(usuario);
     }
     

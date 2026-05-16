@@ -20,5 +20,7 @@ public interface UsuarioService {
     public List<UsuarioResponseDTO> findByAll(); 
 
     public UsuarioResponseDTO findByLoginAndSenha(String login, String senha);
+
+    public UsuarioResponseDTO findByUsername(String username);
     
 }

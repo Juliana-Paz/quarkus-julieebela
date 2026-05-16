@@ -9,19 +9,19 @@ public enum Perfil {
     USER(2, "User");
 
     private final Integer id;
-    private final String label;
+    private final String nome;
 
-    Perfil(Integer id, String label) {
+    Perfil(Integer id, String nome) {
         this.id = id;
-        this.label = label;
+        this.nome = nome;
     }
 
     public Integer getId() {
         return id;
     }
 
-    public String getLabel() {
-        return label;
+    public String getNome() {
+        return nome;
     }
 
     public static Perfil valueOf(Integer id) {

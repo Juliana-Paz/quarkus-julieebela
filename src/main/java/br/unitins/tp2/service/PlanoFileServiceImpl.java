@@ -65,38 +65,53 @@ public class PlanoFileServiceImpl implements FileService {
         }
 
         validarTamanho(file);
-        validarExtensao(file);
+        validarExtensaoArquivo(file);
 
-        String fid = uploadParaSeaweed(file);
-        Arquivo arquivo = buildArquivoEntity(file, fid);
+        String originalName = Paths.get(file.fileName()).getFileName().toString();
+        String mimeType = resolveMimeType(originalName, file.contentType());
+        byte[] fileBytes = Files.readAllBytes(file.uploadedFile());
+
+        String fid = uploadParaSeaweed(originalName, mimeType, fileBytes);
+        Arquivo arquivo = buildArquivoEntity(originalName, mimeType, file.size(), sha256Hex(file.uploadedFile()), fid);
         arquivoRepository.persist(arquivo);
         plano.addArquivo(arquivo);
     }
 
-    private Arquivo buildArquivoEntity(FileUpload file, String fid) throws IOException {
+    @Transactional
+    public void salvarLocal(Long id, String originalName, String mimeType, byte[] fileBytes) {
+        Plano plano = planoRepository.findById(id);
+        if (plano == null) {
+            throw new NotFoundException("Plano não encontrado.");
+        }
+        if (!plano.getArquivos().isEmpty()) {
+            return;
+        }
+
+        validarTamanho(fileBytes);
+        validarExtensaoNome(originalName);
+
+        String safeName = Paths.get(originalName).getFileName().toString();
+        String resolvedMimeType = resolveMimeType(safeName, mimeType);
+        String fid = uploadParaSeaweed(safeName, resolvedMimeType, fileBytes);
+        Arquivo arquivo = buildArquivoEntity(safeName, resolvedMimeType, (long) fileBytes.length, sha256Hex(fileBytes), fid);
+        arquivoRepository.persist(arquivo);
+        plano.addArquivo(arquivo);
+    }
+
+    private Arquivo buildArquivoEntity(String originalName, String mimeType, Long tamanhoBytes, String sha256, String fid) {
         Arquivo arquivo = new Arquivo();
         arquivo.setFid(fid);
-
-        String originalName = Paths.get(file.fileName()).getFileName().toString();
         arquivo.setNomeOriginal(originalName);
-
-        String mimeType = file.contentType();
-        if (mimeType == null || mimeType.isBlank()) {
-            mimeType = guessMimeTypeByExtension(getExtension(originalName));
-        }
-        arquivo.setMimeType(mimeType == null ? "application/octet-stream" : mimeType);
-
-        arquivo.setTamanhoBytes(file.size());
-        arquivo.setSha256(sha256Hex(file.uploadedFile()));
+        arquivo.setMimeType(mimeType);
+        arquivo.setTamanhoBytes(tamanhoBytes);
+        arquivo.setSha256(sha256);
         return arquivo;
     }
 
-    private String uploadParaSeaweed(FileUpload file) throws IOException {
+    private String uploadParaSeaweed(String fileName, String contentType, byte[] fileBytes) {
         // Normaliza o nome apenas para envio; o metadado original fica salvo no banco.
-        String fileName = Paths.get(file.fileName()).getFileName().toString();
         String extension = getExtension(fileName);
         String normalizedName = UUID.randomUUID() + (extension == null ? "" : "." + extension.toLowerCase(Locale.ROOT));
-        byte[] fileBytes = Files.readAllBytes(file.uploadedFile());
 
         // 1) Solicita ao master um FID e o endereço do volume responsável pelo upload.
         JsonNode assignJson = requestJson("GET", masterUrl + "/dir/assign", null, null);
@@ -112,7 +127,7 @@ public class PlanoFileServiceImpl implements FileService {
 
         // 2) Monta multipart manualmente para enviar o conteúdo ao volume indicado.
         String boundary = "----QuarkusSeaweedBoundary" + UUID.randomUUID();
-        byte[] body = buildMultipartBody(boundary, normalizedName, file.contentType(), fileBytes);
+        byte[] body = buildMultipartBody(boundary, normalizedName, contentType, fileBytes);
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create("http://" + volumeUrl + "/" + fid))
@@ -127,7 +142,9 @@ public class PlanoFileServiceImpl implements FileService {
             response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw new IOException("Upload interrompido.", e);
+            throw new WebApplicationException("Upload interrompido.", Response.Status.INTERNAL_SERVER_ERROR);
+        } catch (IOException e) {
+            throw new WebApplicationException("Erro ao enviar imagem para o SeaweedFS.", e, Response.Status.BAD_GATEWAY);
         }
 
         // 4) Qualquer retorno fora de 2xx vira erro de gateway entre API e storage.
@@ -299,8 +316,17 @@ public class PlanoFileServiceImpl implements FileService {
         }
     }
 
-    private void validarExtensao(FileUpload file) {
+    private void validarExtensaoArquivo(FileUpload file) {
         String ext = getExtension(file.fileName());
+        validarExtensao(ext);
+    }
+
+    private void validarExtensaoNome(String fileName) {
+        String ext = getExtension(fileName);
+        validarExtensao(ext);
+    }
+
+    private void validarExtensao(String ext) {
         if (ext == null || !ALLOWED_EXTENSIONS.contains(ext.toLowerCase(Locale.ROOT))) {
             throw new WebApplicationException("Extensão de arquivo não suportada.", Response.Status.BAD_REQUEST);
         }
@@ -338,6 +364,38 @@ public class PlanoFileServiceImpl implements FileService {
         } catch (NoSuchAlgorithmException e) {
             throw new IllegalStateException("SHA-256 não disponível na JVM.", e);
         }
+    }
+
+    private String sha256Hex(byte[] bytes) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            return HexFormat.of().formatHex(digest.digest(bytes));
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalStateException("SHA-256 não disponível na JVM.", e);
+        }
+    }
+
+    private void validarTamanho(byte[] bytes) {
+        if (bytes == null) {
+            throw new WebApplicationException("Arquivo de imagem não informado.", Response.Status.BAD_REQUEST);
+        }
+        long size = bytes.length;
+        if (size <= 0) {
+            throw new WebApplicationException("Arquivo vazio.", Response.Status.BAD_REQUEST);
+        }
+        if (size < MIN_FILE_SIZE) {
+            throw new WebApplicationException("Arquivo muito pequeno para ser considerado imagem válida.", Response.Status.BAD_REQUEST);
+        }
+        if (size > MAX_FILE_SIZE) {
+            throw new WebApplicationException("Arquivo muito grande. Máximo permitido: " + MAX_FILE_SIZE + " bytes.", Response.Status.BAD_REQUEST);
+        }
+    }
+
+    private String resolveMimeType(String originalName, String mimeType) {
+        if (mimeType == null || mimeType.isBlank()) {
+            return guessMimeTypeByExtension(getExtension(originalName));
+        }
+        return mimeType;
     }
 
     private String guessMimeTypeByExtension(String ext) {
