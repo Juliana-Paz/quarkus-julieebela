@@ -1,5 +1,6 @@
 package br.unitins.tp2.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -7,23 +8,22 @@ import jakarta.persistence.ManyToOne;
 @Entity
 public class ItemPedido extends DefaultEntity {
 
-    @ManyToOne
-    @JoinColumn(name = "plano_id", nullable = false)
-    private Plano plano;
+    @Column(nullable = false)
     private Integer quantidade;
-    private Double preco;
+
+    @Column(name = "preco_unitario", nullable = false)
+    private Double precoUnitario;
+
+    @Column(nullable = false)
+    private Double subtotal;
 
     @ManyToOne
     @JoinColumn(name = "pedido_id", nullable = false)
     private Pedido pedido;
 
-    public Plano getPlano() {
-        return plano;
-    }
-
-    public void setPlano(Plano plano) {
-        this.plano = plano;
-    }
+    @ManyToOne
+    @JoinColumn(name = "pijama_id", nullable = false)
+    private Pijama pijama;
 
     public Integer getQuantidade() {
         return quantidade;
@@ -33,12 +33,20 @@ public class ItemPedido extends DefaultEntity {
         this.quantidade = quantidade;
     }
 
-    public Double getPreco() {
-        return preco;
+    public Double getPrecoUnitario() {
+        return precoUnitario;
     }
 
-    public void setPreco(Double preco) {
-        this.preco = preco;
+    public void setPrecoUnitario(Double precoUnitario) {
+        this.precoUnitario = precoUnitario;
+    }
+
+    public Double getSubtotal() {
+        return subtotal;
+    }
+
+    public void setSubtotal(Double subtotal) {
+        this.subtotal = subtotal;
     }
 
     public Pedido getPedido() {
@@ -49,6 +57,12 @@ public class ItemPedido extends DefaultEntity {
         this.pedido = pedido;
     }
 
-    
-    
+    public Pijama getPijama() {
+        return pijama;
+    }
+
+    public void setPijama(Pijama pijama) {
+        this.pijama = pijama;
+    }
+
 }
