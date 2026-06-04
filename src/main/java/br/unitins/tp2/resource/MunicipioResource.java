@@ -3,6 +3,7 @@ package br.unitins.tp2.resource;
 import br.unitins.tp2.dto.MunicipioDTO;
 import br.unitins.tp2.dto.MunicipioResponseDTO;
 import br.unitins.tp2.service.MunicipioService;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.Consumes;
@@ -52,6 +53,7 @@ public class MunicipioResource {
     }
     
     @POST
+    @RolesAllowed("Adm")
     public Response incluir(MunicipioDTO dto) {
         MunicipioResponseDTO retorno = service.create(dto);
         return Response.status(201).entity(retorno).build();
@@ -59,6 +61,7 @@ public class MunicipioResource {
 
     @PUT
     @Path("/{id}")
+    @RolesAllowed("Adm")
     public Response alterar(MunicipioDTO dto, @PathParam("id") Long id) {
         service.update(id, dto);
         return Response.status(Status.NO_CONTENT).build();
@@ -66,6 +69,7 @@ public class MunicipioResource {
 
     @DELETE
     @Path("/{id}")
+    @RolesAllowed("Adm")
     public Response apagar(@PathParam("id") Long id) {
         service.delete(id);
         return Response.status(Status.NO_CONTENT).build();

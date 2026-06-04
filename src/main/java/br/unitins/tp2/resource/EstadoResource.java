@@ -53,19 +53,21 @@ public class EstadoResource {
     }
 
     @POST
-    @RolesAllowed("user")
+    @RolesAllowed("Adm")
     public Estado incluir(EstadoDTO dto) {
         return service.create(dto);
     }
 
     @PUT
     @Path("/{id}")
+    @RolesAllowed("Adm")
     public void alterar(@PathParam("id") Long id, EstadoDTO estado) {
         service.update(id, estado);
     }
 
     @DELETE
     @Path("/{id}")
+    @RolesAllowed("Adm")
     public void apagar(@PathParam("id") Long id) {
         service.delete(id);
     }
