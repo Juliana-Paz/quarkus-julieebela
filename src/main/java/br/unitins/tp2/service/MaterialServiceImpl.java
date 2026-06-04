@@ -5,8 +5,10 @@ import java.util.Set;
 
 import br.unitins.tp2.dto.MaterialDTO;
 import br.unitins.tp2.dto.MaterialResponseDTO;
+import br.unitins.tp2.exception.ValidationException;
 import br.unitins.tp2.model.Material;
 import br.unitins.tp2.repository.MaterialRepository;
+import br.unitins.tp2.repository.PijamaRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -20,6 +22,9 @@ public class MaterialServiceImpl implements MaterialService {
 
     @Inject
     MaterialRepository materialRepository;
+
+    @Inject
+    PijamaRepository pijamaRepository;
 
     @Inject
     Validator validator;
@@ -47,8 +52,10 @@ public class MaterialServiceImpl implements MaterialService {
     @Override
     @Transactional
     public void delete(Long id) {
-        boolean removed = materialRepository.deleteById(id);
-        if (!removed) throw new NotFoundException("Material não encontrado.");
+        if (materialRepository.findById(id) == null) throw new NotFoundException("Material não encontrado.");
+        if (pijamaRepository.existsByMaterial(id))
+            throw ValidationException.of("material", "Não é possível excluir o material pois existem pijamas vinculados a ele.");
+        materialRepository.deleteById(id);
     }
 
     @Override

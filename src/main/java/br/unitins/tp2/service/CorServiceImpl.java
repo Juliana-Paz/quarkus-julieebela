@@ -5,8 +5,10 @@ import java.util.Set;
 
 import br.unitins.tp2.dto.CorDTO;
 import br.unitins.tp2.dto.CorResponseDTO;
+import br.unitins.tp2.exception.ValidationException;
 import br.unitins.tp2.model.Cor;
 import br.unitins.tp2.repository.CorRepository;
+import br.unitins.tp2.repository.PijamaRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -20,6 +22,9 @@ public class CorServiceImpl implements CorService {
 
     @Inject
     CorRepository corRepository;
+
+    @Inject
+    PijamaRepository pijamaRepository;
 
     @Inject
     Validator validator;
@@ -47,8 +52,10 @@ public class CorServiceImpl implements CorService {
     @Override
     @Transactional
     public void delete(Long id) {
-        boolean removed = corRepository.deleteById(id);
-        if (!removed) throw new NotFoundException("Cor não encontrada.");
+        if (corRepository.findById(id) == null) throw new NotFoundException("Cor não encontrada.");
+        if (pijamaRepository.existsByCor(id))
+            throw ValidationException.of("cor", "Não é possível excluir a cor pois existem pijamas vinculados a ela.");
+        corRepository.deleteById(id);
     }
 
     @Override

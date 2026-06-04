@@ -47,4 +47,12 @@ public class PijamaRepository implements PanacheRepository<Pijama> {
         return count("estampa.id", estampaId);
     }
 
+    public boolean existsByCor(Long corId) {
+        return count("SELECT COUNT(p) FROM Pijama p JOIN p.cores c WHERE c.id = ?1", corId) > 0;
+    }
+
+    public boolean existsByMaterial(Long materialId) {
+        return count("SELECT COUNT(p) FROM Pijama p JOIN p.materiais m WHERE m.id = ?1", materialId) > 0;
+    }
+
 }
