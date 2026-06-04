@@ -5,8 +5,10 @@ import java.util.Set;
 
 import br.unitins.tp2.dto.MarcaDTO;
 import br.unitins.tp2.dto.MarcaResponseDTO;
+import br.unitins.tp2.exception.ValidationException;
 import br.unitins.tp2.model.Marca;
 import br.unitins.tp2.repository.MarcaRepository;
+import br.unitins.tp2.repository.PijamaRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -20,6 +22,9 @@ public class MarcaServiceImpl implements MarcaService {
 
     @Inject
     MarcaRepository marcaRepository;
+
+    @Inject
+    PijamaRepository pijamaRepository;
 
     @Inject
     Validator validator;
@@ -47,8 +52,10 @@ public class MarcaServiceImpl implements MarcaService {
     @Override
     @Transactional
     public void delete(Long id) {
-        boolean removed = marcaRepository.deleteById(id);
-        if (!removed) throw new NotFoundException("Marca não encontrada.");
+        if (marcaRepository.findById(id) == null) throw new NotFoundException("Marca não encontrada.");
+        if (pijamaRepository.countByMarca(id) > 0)
+            throw ValidationException.of("marca", "Não é possível excluir a marca pois existem pijamas vinculados a ela.");
+        marcaRepository.deleteById(id);
     }
 
     @Override

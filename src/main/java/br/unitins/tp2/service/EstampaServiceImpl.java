@@ -5,8 +5,10 @@ import java.util.Set;
 
 import br.unitins.tp2.dto.EstampaDTO;
 import br.unitins.tp2.dto.EstampaResponseDTO;
+import br.unitins.tp2.exception.ValidationException;
 import br.unitins.tp2.model.Estampa;
 import br.unitins.tp2.repository.EstampaRepository;
+import br.unitins.tp2.repository.PijamaRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -20,6 +22,9 @@ public class EstampaServiceImpl implements EstampaService {
 
     @Inject
     EstampaRepository estampaRepository;
+
+    @Inject
+    PijamaRepository pijamaRepository;
 
     @Inject
     Validator validator;
@@ -47,8 +52,10 @@ public class EstampaServiceImpl implements EstampaService {
     @Override
     @Transactional
     public void delete(Long id) {
-        boolean removed = estampaRepository.deleteById(id);
-        if (!removed) throw new NotFoundException("Estampa não encontrada.");
+        if (estampaRepository.findById(id) == null) throw new NotFoundException("Estampa não encontrada.");
+        if (pijamaRepository.countByEstampa(id) > 0)
+            throw ValidationException.of("estampa", "Não é possível excluir a estampa pois existem pijamas vinculados a ela.");
+        estampaRepository.deleteById(id);
     }
 
     @Override

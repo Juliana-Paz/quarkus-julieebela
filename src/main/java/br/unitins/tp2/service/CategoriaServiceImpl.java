@@ -5,8 +5,10 @@ import java.util.Set;
 
 import br.unitins.tp2.dto.CategoriaDTO;
 import br.unitins.tp2.dto.CategoriaResponseDTO;
+import br.unitins.tp2.exception.ValidationException;
 import br.unitins.tp2.model.Categoria;
 import br.unitins.tp2.repository.CategoriaRepository;
+import br.unitins.tp2.repository.PijamaRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -20,6 +22,9 @@ public class CategoriaServiceImpl implements CategoriaService {
 
     @Inject
     CategoriaRepository categoriaRepository;
+
+    @Inject
+    PijamaRepository pijamaRepository;
 
     @Inject
     Validator validator;
@@ -47,8 +52,10 @@ public class CategoriaServiceImpl implements CategoriaService {
     @Override
     @Transactional
     public void delete(Long id) {
-        boolean removed = categoriaRepository.deleteById(id);
-        if (!removed) throw new NotFoundException("Categoria não encontrada.");
+        if (categoriaRepository.findById(id) == null) throw new NotFoundException("Categoria não encontrada.");
+        if (pijamaRepository.countByCategoria(id) > 0)
+            throw ValidationException.of("categoria", "Não é possível excluir a categoria pois existem pijamas vinculados a ela.");
+        categoriaRepository.deleteById(id);
     }
 
     @Override

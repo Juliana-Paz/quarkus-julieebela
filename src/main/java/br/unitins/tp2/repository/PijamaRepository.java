@@ -35,4 +35,16 @@ public class PijamaRepository implements PanacheRepository<Pijama> {
         return find("SELECT p FROM Pijama p JOIN p.imagens a WHERE a.id = ?1", arquivoId).firstResultOptional();
     }
 
+    public long countByCategoria(Long categoriaId) {
+        return count("categoria.id", categoriaId);
+    }
+
+    public long countByMarca(Long marcaId) {
+        return count("marca.id", marcaId);
+    }
+
+    public long countByEstampa(Long estampaId) {
+        return count("estampa.id", estampaId);
+    }
+
 }
