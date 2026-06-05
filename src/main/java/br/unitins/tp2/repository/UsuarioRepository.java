@@ -19,7 +19,19 @@ public class UsuarioRepository implements PanacheRepository<Usuario>{
     public Usuario findByUsernameAndSenha(String username, String senha){
         if (username == null || senha == null)
             return null;
-            
-        return find("username = ?1 AND senha = ?2 ", username, senha).firstResult();
+
+        String input = username.toUpperCase();
+
+        return getEntityManager()
+                .createQuery(
+                    "SELECT u FROM Usuario u WHERE u.senha = :senha AND " +
+                    "(UPPER(u.username) = :input OR " +
+                    " EXISTS (SELECT c FROM Cliente c WHERE c.usuario = u AND UPPER(c.email) = :input))",
+                    Usuario.class)
+                .setParameter("senha", senha)
+                .setParameter("input", input)
+                .getResultStream()
+                .findFirst()
+                .orElse(null);
     }
 }

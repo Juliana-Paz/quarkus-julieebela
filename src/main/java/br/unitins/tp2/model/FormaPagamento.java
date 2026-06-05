@@ -5,10 +5,10 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
 public enum FormaPagamento {
 
-    CARTAO_CREDITO(1, "Cartão de Crédito"),
-    CARTAO_DEBITO(2, "Cartão de Débito"),
-    PIX(3, "Pix"),
-    BOLETO(4, "Boleto");
+    PIX(1, "Pix"),
+    BOLETO(2, "Boleto"),
+    CARTAO_CREDITO(3, "Cartão de Crédito"),
+    CARTAO_DEBITO(4, "Cartão de Débito");
 
     private final Integer id;
     private final String nome;

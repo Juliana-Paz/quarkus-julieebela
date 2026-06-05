@@ -2,6 +2,7 @@ package br.unitins.tp2.resource;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.List;
 
 import org.jboss.resteasy.reactive.RestForm;
 import org.jboss.resteasy.reactive.multipart.FileUpload;
@@ -112,8 +113,29 @@ public class PijamaResource {
 
     @POST
     @RolesAllowed("Adm")
-    public Response incluir(@Valid PijamaDTO dto) {
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    public Response incluir(
+            @RestForm String nome,
+            @RestForm String descricao,
+            @RestForm Double preco,
+            @RestForm String modelo,
+            @RestForm Integer estoque,
+            @RestForm Boolean ativo,
+            @RestForm Integer idTamanho,
+            @RestForm Integer idSexo,
+            @RestForm Long idCategoria,
+            @RestForm Long idMarca,
+            @RestForm Long idEstampa,
+            @RestForm List<Long> idsCores,
+            @RestForm List<Long> idsMateriais,
+            @RestForm("file") FileUpload imagem) throws IOException {
+        PijamaDTO dto = new PijamaDTO(nome, descricao, preco, modelo, estoque, ativo,
+                idTamanho, idSexo, idCategoria, idMarca, idEstampa, idsCores, idsMateriais);
         PijamaResponseDTO criado = service.create(dto);
+        if (imagem != null && imagem.uploadedFile() != null && imagem.size() > 0) {
+            service.adicionarImagem(criado.id(), imagem);
+            criado = service.findById(criado.id());
+        }
         URI location = UriBuilder.fromResource(PijamaResource.class)
                 .path("{id}")
                 .build(criado.id());
@@ -123,8 +145,31 @@ public class PijamaResource {
     @PUT
     @Path("/{id: \\d+}")
     @RolesAllowed("Adm")
-    public Response alterar(@PathParam("id") Long id, @Valid PijamaDTO dto) {
-        return Response.ok(service.update(id, dto)).build();
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    public Response alterar(
+            @PathParam("id") Long id,
+            @RestForm String nome,
+            @RestForm String descricao,
+            @RestForm Double preco,
+            @RestForm String modelo,
+            @RestForm Integer estoque,
+            @RestForm Boolean ativo,
+            @RestForm Integer idTamanho,
+            @RestForm Integer idSexo,
+            @RestForm Long idCategoria,
+            @RestForm Long idMarca,
+            @RestForm Long idEstampa,
+            @RestForm List<Long> idsCores,
+            @RestForm List<Long> idsMateriais,
+            @RestForm("file") FileUpload imagem) throws IOException {
+        PijamaDTO dto = new PijamaDTO(nome, descricao, preco, modelo, estoque, ativo,
+                idTamanho, idSexo, idCategoria, idMarca, idEstampa, idsCores, idsMateriais);
+        PijamaResponseDTO atualizado = service.update(id, dto);
+        if (imagem != null && imagem.uploadedFile() != null && imagem.size() > 0) {
+            service.adicionarImagem(id, imagem);
+            atualizado = service.findById(id);
+        }
+        return Response.ok(atualizado).build();
     }
 
     @DELETE
