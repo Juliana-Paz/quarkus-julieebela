@@ -5,6 +5,7 @@ import org.eclipse.microprofile.jwt.JsonWebToken;
 import br.unitins.tp2.dto.AuthUsuarioDTO;
 import br.unitins.tp2.dto.AuthResponseDTO;
 import br.unitins.tp2.dto.UsuarioResponseDTO;
+import br.unitins.tp2.dto.usuario.AdmUpdateDTO;
 import br.unitins.tp2.service.HashService;
 import br.unitins.tp2.service.JwtService;
 import br.unitins.tp2.service.UsuarioService;
@@ -13,6 +14,7 @@ import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
+import jakarta.ws.rs.PATCH;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
@@ -56,6 +58,13 @@ public class AuthResource {
         }
 
         return Response.ok(usuario).build();
+    }
+
+    @PATCH
+    @Path("/me")
+    @Authenticated
+    public Response updateMe(@Valid AdmUpdateDTO dto) {
+        return Response.ok(usuarioService.updateAdm(jwt.getSubject(), dto)).build();
     }
 
     private UsuarioResponseDTO autenticar(AuthUsuarioDTO authDTO) {

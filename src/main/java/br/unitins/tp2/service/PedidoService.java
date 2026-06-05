@@ -4,6 +4,7 @@ import java.util.List;
 
 import br.unitins.tp2.dto.PedidoDTO;
 import br.unitins.tp2.dto.PedidoResponseDTO;
+import br.unitins.tp2.dto.pedido.DashboardStatsDTO;
 import br.unitins.tp2.model.StatusPedido;
 
 public interface PedidoService {
@@ -19,5 +20,7 @@ public interface PedidoService {
     long count();
 
     PedidoResponseDTO updateStatus(Long id, StatusPedido novoStatus);
+
+    DashboardStatsDTO getStats();
 
 }
