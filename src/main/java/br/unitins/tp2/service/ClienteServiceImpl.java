@@ -71,7 +71,29 @@ public class ClienteServiceImpl implements ClienteService {
             dto.enderecos().forEach(e -> cliente.getEnderecos().add(toEndereco(e)));
         }
 
-        clienteRepository.persist(cliente);
+        try {
+            clienteRepository.persist(cliente);
+            clienteRepository.flush();
+        } catch (Exception ex) {
+            Throwable cause = ex;
+            while (cause != null) {
+                if (cause instanceof org.hibernate.exception.ConstraintViolationException hcve) {
+                    String constraintName = hcve.getConstraintName() != null ? hcve.getConstraintName() : "";
+                    String sqlMsg = hcve.getSQLException() != null && hcve.getSQLException().getMessage() != null
+                            ? hcve.getSQLException().getMessage() : "";
+                    String combined = (constraintName + " " + sqlMsg).toLowerCase();
+                    if (combined.contains("cliente_email_key")) {
+                        throw ValidationException.of("email", "E-mail já cadastrado.");
+                    }
+                    if (combined.contains("cliente_cpf_key")) {
+                        throw ValidationException.of("cpf", "CPF já cadastrado.");
+                    }
+                }
+                cause = cause.getCause();
+            }
+            if (ex instanceof RuntimeException re) throw re;
+            throw new RuntimeException(ex);
+        }
         return ClienteResponseDTO.valueOf(cliente);
     }
 

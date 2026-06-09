@@ -19,4 +19,10 @@ public class ClienteRepository implements PanacheRepository<Cliente> {
         return find("cpf = ?1", cpf).firstResult();
     }
 
+    public Cliente findByEmail(String email) {
+        if (email == null)
+            return null;
+        return find("email = ?1", email).firstResult();
+    }
+
 }

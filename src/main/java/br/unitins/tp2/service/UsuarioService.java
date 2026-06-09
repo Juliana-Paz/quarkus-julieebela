@@ -4,6 +4,7 @@ import java.util.List;
 
 import br.unitins.tp2.dto.UsuarioDTO;
 import br.unitins.tp2.dto.UsuarioResponseDTO;
+import br.unitins.tp2.dto.usuario.AdmUpdateDTO;
 
 public interface UsuarioService {
 
@@ -22,5 +23,7 @@ public interface UsuarioService {
     public UsuarioResponseDTO findByLoginAndSenha(String login, String senha);
 
     public UsuarioResponseDTO findByUsername(String username);
-    
+
+    public UsuarioResponseDTO updateAdm(String usernameLogado, AdmUpdateDTO dto);
+
 }

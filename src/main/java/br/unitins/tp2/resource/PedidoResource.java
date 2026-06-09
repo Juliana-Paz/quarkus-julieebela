@@ -7,6 +7,7 @@ import org.eclipse.microprofile.jwt.JsonWebToken;
 import br.unitins.tp2.dto.PedidoDTO;
 import br.unitins.tp2.dto.PedidoResponseDTO;
 import br.unitins.tp2.dto.PedidoStatusDTO;
+import br.unitins.tp2.dto.pedido.DashboardStatsDTO;
 import br.unitins.tp2.model.StatusPedido;
 import br.unitins.tp2.service.PedidoService;
 import io.quarkus.security.Authenticated;
@@ -69,6 +70,13 @@ public class PedidoResource {
                 .path("{id}")
                 .build(criado.id());
         return Response.created(location).entity(criado).build();
+    }
+
+    @GET
+    @Path("/admin/stats")
+    @RolesAllowed("Adm")
+    public DashboardStatsDTO getStats() {
+        return service.getStats();
     }
 
     @GET

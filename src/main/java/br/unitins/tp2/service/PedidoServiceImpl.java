@@ -2,13 +2,18 @@ package br.unitins.tp2.service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import br.unitins.tp2.dto.PedidoDTO;
 import br.unitins.tp2.dto.PedidoResponseDTO;
+import br.unitins.tp2.dto.pedido.DashboardStatsDTO;
+import br.unitins.tp2.dto.pedido.PijamaMaisVendidoDTO;
+import br.unitins.tp2.dto.pedido.ReceitaMensalDTO;
 import br.unitins.tp2.exception.ValidationException;
 import br.unitins.tp2.model.Cliente;
 import br.unitins.tp2.model.CupomDesconto;
@@ -195,6 +200,61 @@ public class PedidoServiceImpl implements PedidoService {
         if (pedido == null) throw new NotFoundException("Pedido não encontrado.");
         pedido.setStatus(novoStatus);
         return PedidoResponseDTO.valueOf(pedido);
+    }
+
+    @Override
+    public DashboardStatsDTO getStats() {
+        List<Pedido> todos = pedidoRepository.listAll();
+
+        long totalPedidos = todos.size();
+        double receitaTotal = todos.stream()
+                .mapToDouble(p -> p.getTotal() != null ? p.getTotal() : 0.0)
+                .sum();
+
+        YearMonth mesAtual = YearMonth.now();
+        List<Pedido> pedidosMes = todos.stream()
+                .filter(p -> p.getData() != null && YearMonth.from(p.getData()).equals(mesAtual))
+                .toList();
+        double receitaMesAtual = pedidosMes.stream()
+                .mapToDouble(p -> p.getTotal() != null ? p.getTotal() : 0.0)
+                .sum();
+        long pedidosMesAtual = pedidosMes.size();
+
+        // Top 5 pijamas mais vendidos
+        Map<Long, int[]> contagem = new HashMap<>();
+        Map<Long, String> nomes = new HashMap<>();
+        for (Pedido p : todos) {
+            if (p.getItens() == null) continue;
+            for (ItemPedido item : p.getItens()) {
+                if (item.getPijama() == null) continue;
+                Long pid = item.getPijama().getId();
+                contagem.computeIfAbsent(pid, k -> new int[]{0})[0] += item.getQuantidade();
+                nomes.put(pid, item.getPijama().getNome());
+            }
+        }
+        List<PijamaMaisVendidoDTO> maisVendidos = contagem.entrySet().stream()
+                .sorted((a, b) -> b.getValue()[0] - a.getValue()[0])
+                .limit(5)
+                .map(e -> new PijamaMaisVendidoDTO(e.getKey(), nomes.get(e.getKey()), e.getValue()[0]))
+                .toList();
+
+        // Receita últimos 6 meses
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("MMM/yy", Locale.of("pt", "BR"));
+        List<ReceitaMensalDTO> receitaMensal = new ArrayList<>();
+        for (int i = 5; i >= 0; i--) {
+            YearMonth ym = mesAtual.minusMonths(i);
+            double rec = todos.stream()
+                    .filter(p -> p.getData() != null && YearMonth.from(p.getData()).equals(ym))
+                    .mapToDouble(p -> p.getTotal() != null ? p.getTotal() : 0.0)
+                    .sum();
+            long qtd = todos.stream()
+                    .filter(p -> p.getData() != null && YearMonth.from(p.getData()).equals(ym))
+                    .count();
+            receitaMensal.add(new ReceitaMensalDTO(ym.format(fmt), rec, qtd));
+        }
+
+        return new DashboardStatsDTO(totalPedidos, receitaTotal, receitaMesAtual,
+                pedidosMesAtual, maisVendidos, receitaMensal);
     }
 
     private void validar(PedidoDTO dto) {
