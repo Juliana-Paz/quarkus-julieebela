@@ -25,44 +25,25 @@ public class ItemPedido extends DefaultEntity {
     @JoinColumn(name = "pijama_id", nullable = false)
     private Pijama pijama;
 
-    public Integer getQuantidade() {
-        return quantidade;
-    }
+    @ManyToOne
+    @JoinColumn(name = "variante_id")
+    private PijamaVariante variante;
 
-    public void setQuantidade(Integer quantidade) {
-        this.quantidade = quantidade;
-    }
+    public Integer getQuantidade() { return quantidade; }
+    public void setQuantidade(Integer quantidade) { this.quantidade = quantidade; }
 
-    public Double getPrecoUnitario() {
-        return precoUnitario;
-    }
+    public Double getPrecoUnitario() { return precoUnitario; }
+    public void setPrecoUnitario(Double precoUnitario) { this.precoUnitario = precoUnitario; }
 
-    public void setPrecoUnitario(Double precoUnitario) {
-        this.precoUnitario = precoUnitario;
-    }
+    public Double getSubtotal() { return subtotal; }
+    public void setSubtotal(Double subtotal) { this.subtotal = subtotal; }
 
-    public Double getSubtotal() {
-        return subtotal;
-    }
+    public Pedido getPedido() { return pedido; }
+    public void setPedido(Pedido pedido) { this.pedido = pedido; }
 
-    public void setSubtotal(Double subtotal) {
-        this.subtotal = subtotal;
-    }
+    public Pijama getPijama() { return pijama; }
+    public void setPijama(Pijama pijama) { this.pijama = pijama; }
 
-    public Pedido getPedido() {
-        return pedido;
-    }
-
-    public void setPedido(Pedido pedido) {
-        this.pedido = pedido;
-    }
-
-    public Pijama getPijama() {
-        return pijama;
-    }
-
-    public void setPijama(Pijama pijama) {
-        this.pijama = pijama;
-    }
-
+    public PijamaVariante getVariante() { return variante; }
+    public void setVariante(PijamaVariante variante) { this.variante = variante; }
 }

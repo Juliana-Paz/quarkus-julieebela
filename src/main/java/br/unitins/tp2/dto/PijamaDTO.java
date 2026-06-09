@@ -2,11 +2,10 @@ package br.unitins.tp2.dto;
 
 import java.util.List;
 
+import br.unitins.tp2.dto.pijama.PijamaVarianteRequestDTO;
 import jakarta.validation.constraints.DecimalMin;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-
 import org.hibernate.validator.constraints.Length;
 
 public record PijamaDTO(
@@ -25,15 +24,8 @@ public record PijamaDTO(
     @Length(max = 100, message = "O modelo deve ter no máximo 100 caracteres.")
     String modelo,
 
-    @NotNull(message = "O estoque é obrigatório.")
-    @Min(value = 0, message = "O estoque não pode ser negativo.")
-    Integer estoque,
-
     @NotNull(message = "O campo ativo é obrigatório.")
     Boolean ativo,
-
-    @NotNull(message = "O tamanho é obrigatório.")
-    Integer idTamanho,
 
     @NotNull(message = "O sexo é obrigatório.")
     Integer idSexo,
@@ -46,8 +38,8 @@ public record PijamaDTO(
 
     Long idEstampa,
 
-    List<Long> idsCores,
+    List<Long> idsMateriais,
 
-    List<Long> idsMateriais
+    List<PijamaVarianteRequestDTO> variantes
 
 ) {}

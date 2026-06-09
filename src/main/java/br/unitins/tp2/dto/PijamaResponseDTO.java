@@ -2,9 +2,9 @@ package br.unitins.tp2.dto;
 
 import java.util.List;
 
+import br.unitins.tp2.dto.pijama.PijamaVarianteResponseDTO;
 import br.unitins.tp2.model.Pijama;
 import br.unitins.tp2.model.SexoPijama;
-import br.unitins.tp2.model.Tamanho;
 
 public record PijamaResponseDTO(
     Long id,
@@ -12,34 +12,36 @@ public record PijamaResponseDTO(
     String descricao,
     Double preco,
     String modelo,
-    Integer estoque,
     Boolean ativo,
-    Tamanho tamanho,
     SexoPijama sexo,
     CategoriaResponseDTO categoria,
     MarcaResponseDTO marca,
     EstampaResponseDTO estampa,
-    List<CorResponseDTO> cores,
     List<MaterialResponseDTO> materiais,
-    List<ArquivoResponseDTO> imagens
+    List<ArquivoResponseDTO> imagens,
+    List<PijamaVarianteResponseDTO> variantes
 ) {
-    public static PijamaResponseDTO valueOf(Pijama pijama) {
+    public static PijamaResponseDTO valueOf(Pijama p) {
         return new PijamaResponseDTO(
-            pijama.getId(),
-            pijama.getNome(),
-            pijama.getDescricao(),
-            pijama.getPreco(),
-            pijama.getModelo(),
-            pijama.getEstoque(),
-            pijama.getAtivo(),
-            pijama.getTamanho(),
-            pijama.getSexo(),
-            CategoriaResponseDTO.valueOf(pijama.getCategoria()),
-            MarcaResponseDTO.valueOf(pijama.getMarca()),
-            pijama.getEstampa() != null ? EstampaResponseDTO.valueOf(pijama.getEstampa()) : null,
-            pijama.getCores().stream().map(CorResponseDTO::valueOf).toList(),
-            pijama.getMateriais().stream().map(MaterialResponseDTO::valueOf).toList(),
-            pijama.getImagens().stream().map(ArquivoResponseDTO::valueOf).toList()
+            p.getId(),
+            p.getNome(),
+            p.getDescricao(),
+            p.getPreco(),
+            p.getModelo(),
+            p.getAtivo(),
+            p.getSexo(),
+            p.getCategoria() != null ? CategoriaResponseDTO.valueOf(p.getCategoria()) : null,
+            p.getMarca() != null ? MarcaResponseDTO.valueOf(p.getMarca()) : null,
+            p.getEstampa() != null ? EstampaResponseDTO.valueOf(p.getEstampa()) : null,
+            p.getMateriais() != null
+                ? p.getMateriais().stream().map(MaterialResponseDTO::valueOf).toList()
+                : List.of(),
+            p.getImagens() != null
+                ? p.getImagens().stream().map(ArquivoResponseDTO::valueOf).toList()
+                : List.of(),
+            p.getVariantes() != null
+                ? p.getVariantes().stream().map(PijamaVarianteResponseDTO::valueOf).toList()
+                : List.of()
         );
     }
 }

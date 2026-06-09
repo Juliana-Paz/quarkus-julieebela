@@ -3,17 +3,21 @@ package br.unitins.tp2.resource;
 import java.io.IOException;
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
 
 import org.jboss.resteasy.reactive.RestForm;
 import org.jboss.resteasy.reactive.multipart.FileUpload;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import br.unitins.tp2.dto.PijamaDTO;
 import br.unitins.tp2.dto.PijamaResponseDTO;
+import br.unitins.tp2.dto.pijama.PijamaVarianteRequestDTO;
 import br.unitins.tp2.service.ArquivoDownload;
 import br.unitins.tp2.service.PijamaService;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.Consumes;
@@ -42,6 +46,9 @@ public class PijamaResource {
 
     @Inject
     PijamaService service;
+
+    @Inject
+    ObjectMapper objectMapper;
 
     @GET
     public Response buscarTodos(@QueryParam("page") @DefaultValue("0") int page,
@@ -119,18 +126,23 @@ public class PijamaResource {
             @RestForm String descricao,
             @RestForm Double preco,
             @RestForm String modelo,
-            @RestForm Integer estoque,
             @RestForm Boolean ativo,
-            @RestForm Integer idTamanho,
             @RestForm Integer idSexo,
             @RestForm Long idCategoria,
             @RestForm Long idMarca,
             @RestForm Long idEstampa,
-            @RestForm List<Long> idsCores,
             @RestForm List<Long> idsMateriais,
+            @RestForm String variantes,
             @RestForm("file") FileUpload imagem) throws IOException {
-        PijamaDTO dto = new PijamaDTO(nome, descricao, preco, modelo, estoque, ativo,
-                idTamanho, idSexo, idCategoria, idMarca, idEstampa, idsCores, idsMateriais);
+
+        List<PijamaVarianteRequestDTO> variantesList = parseVariantes(variantes);
+        if (variantesList == null) {
+            return Response.status(400)
+                    .entity(Map.of("message", "JSON de variantes inválido.")).build();
+        }
+
+        PijamaDTO dto = new PijamaDTO(nome, descricao, preco, modelo, ativo,
+                idSexo, idCategoria, idMarca, idEstampa, idsMateriais, variantesList);
         PijamaResponseDTO criado = service.create(dto);
         if (imagem != null && imagem.uploadedFile() != null && imagem.size() > 0) {
             service.adicionarImagem(criado.id(), imagem);
@@ -152,18 +164,23 @@ public class PijamaResource {
             @RestForm String descricao,
             @RestForm Double preco,
             @RestForm String modelo,
-            @RestForm Integer estoque,
             @RestForm Boolean ativo,
-            @RestForm Integer idTamanho,
             @RestForm Integer idSexo,
             @RestForm Long idCategoria,
             @RestForm Long idMarca,
             @RestForm Long idEstampa,
-            @RestForm List<Long> idsCores,
             @RestForm List<Long> idsMateriais,
+            @RestForm String variantes,
             @RestForm("file") FileUpload imagem) throws IOException {
-        PijamaDTO dto = new PijamaDTO(nome, descricao, preco, modelo, estoque, ativo,
-                idTamanho, idSexo, idCategoria, idMarca, idEstampa, idsCores, idsMateriais);
+
+        List<PijamaVarianteRequestDTO> variantesList = parseVariantes(variantes);
+        if (variantesList == null) {
+            return Response.status(400)
+                    .entity(Map.of("message", "JSON de variantes inválido.")).build();
+        }
+
+        PijamaDTO dto = new PijamaDTO(nome, descricao, preco, modelo, ativo,
+                idSexo, idCategoria, idMarca, idEstampa, idsMateriais, variantesList);
         PijamaResponseDTO atualizado = service.update(id, dto);
         if (imagem != null && imagem.uploadedFile() != null && imagem.size() > 0) {
             service.adicionarImagem(id, imagem);
@@ -221,4 +238,13 @@ public class PijamaResource {
         return Response.noContent().build();
     }
 
+    private List<PijamaVarianteRequestDTO> parseVariantes(String json) {
+        if (json == null || json.isBlank()) return List.of();
+        try {
+            return objectMapper.readValue(json,
+                    new TypeReference<List<PijamaVarianteRequestDTO>>() {});
+        } catch (IOException e) {
+            return null;
+        }
+    }
 }

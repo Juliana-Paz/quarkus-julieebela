@@ -29,12 +29,7 @@ public class Pijama extends DefaultEntity {
     private String modelo;
 
     @Column(nullable = false)
-    private Integer estoque;
-
-    @Column(nullable = false)
     private Boolean ativo;
-
-    private Tamanho tamanho;
 
     private SexoPijama sexo;
 
@@ -52,14 +47,6 @@ public class Pijama extends DefaultEntity {
 
     @ManyToMany
     @JoinTable(
-        name = "pijama_cor",
-        joinColumns = @JoinColumn(name = "pijama_id"),
-        inverseJoinColumns = @JoinColumn(name = "cor_id")
-    )
-    private List<Cor> cores = new ArrayList<>();
-
-    @ManyToMany
-    @JoinTable(
         name = "pijama_material",
         joinColumns = @JoinColumn(name = "pijama_id"),
         inverseJoinColumns = @JoinColumn(name = "material_id")
@@ -74,130 +61,53 @@ public class Pijama extends DefaultEntity {
     )
     private List<Arquivo> imagens = new ArrayList<>();
 
-    public String getNome() {
-        return nome;
-    }
+    @OneToMany(mappedBy = "pijama", cascade = CascadeType.ALL,
+               orphanRemoval = true, fetch = FetchType.EAGER)
+    private List<PijamaVariante> variantes = new ArrayList<>();
 
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
+    public String getNome() { return nome; }
+    public void setNome(String nome) { this.nome = nome; }
 
-    public String getDescricao() {
-        return descricao;
-    }
+    public String getDescricao() { return descricao; }
+    public void setDescricao(String descricao) { this.descricao = descricao; }
 
-    public void setDescricao(String descricao) {
-        this.descricao = descricao;
-    }
+    public Double getPreco() { return preco; }
+    public void setPreco(Double preco) { this.preco = preco; }
 
-    public Double getPreco() {
-        return preco;
-    }
+    public String getModelo() { return modelo; }
+    public void setModelo(String modelo) { this.modelo = modelo; }
 
-    public void setPreco(Double preco) {
-        this.preco = preco;
-    }
+    public Boolean getAtivo() { return ativo; }
+    public void setAtivo(Boolean ativo) { this.ativo = ativo; }
 
-    public String getModelo() {
-        return modelo;
-    }
+    public SexoPijama getSexo() { return sexo; }
+    public void setSexo(SexoPijama sexo) { this.sexo = sexo; }
 
-    public void setModelo(String modelo) {
-        this.modelo = modelo;
-    }
+    public Categoria getCategoria() { return categoria; }
+    public void setCategoria(Categoria categoria) { this.categoria = categoria; }
 
-    public Integer getEstoque() {
-        return estoque;
-    }
+    public Marca getMarca() { return marca; }
+    public void setMarca(Marca marca) { this.marca = marca; }
 
-    public void setEstoque(Integer estoque) {
-        this.estoque = estoque;
-    }
+    public Estampa getEstampa() { return estampa; }
+    public void setEstampa(Estampa estampa) { this.estampa = estampa; }
 
-    public Boolean getAtivo() {
-        return ativo;
-    }
+    public List<Material> getMateriais() { return materiais; }
+    public void setMateriais(List<Material> materiais) { this.materiais = materiais; }
 
-    public void setAtivo(Boolean ativo) {
-        this.ativo = ativo;
-    }
-
-    public Tamanho getTamanho() {
-        return tamanho;
-    }
-
-    public void setTamanho(Tamanho tamanho) {
-        this.tamanho = tamanho;
-    }
-
-    public SexoPijama getSexo() {
-        return sexo;
-    }
-
-    public void setSexo(SexoPijama sexo) {
-        this.sexo = sexo;
-    }
-
-    public Categoria getCategoria() {
-        return categoria;
-    }
-
-    public void setCategoria(Categoria categoria) {
-        this.categoria = categoria;
-    }
-
-    public Marca getMarca() {
-        return marca;
-    }
-
-    public void setMarca(Marca marca) {
-        this.marca = marca;
-    }
-
-    public Estampa getEstampa() {
-        return estampa;
-    }
-
-    public void setEstampa(Estampa estampa) {
-        this.estampa = estampa;
-    }
-
-    public List<Cor> getCores() {
-        return cores;
-    }
-
-    public void setCores(List<Cor> cores) {
-        this.cores = cores;
-    }
-
-    public List<Material> getMateriais() {
-        return materiais;
-    }
-
-    public void setMateriais(List<Material> materiais) {
-        this.materiais = materiais;
-    }
-
-    public List<Arquivo> getImagens() {
-        return imagens;
-    }
-
-    public void setImagens(List<Arquivo> imagens) {
-        this.imagens = imagens;
-    }
+    public List<Arquivo> getImagens() { return imagens; }
+    public void setImagens(List<Arquivo> imagens) { this.imagens = imagens; }
 
     public void addImagem(Arquivo imagem) {
-        if (imagem == null) {
-            return;
-        }
+        if (imagem == null) return;
         imagens.add(imagem);
     }
 
     public void removeImagem(Arquivo imagem) {
-        if (imagem == null) {
-            return;
-        }
+        if (imagem == null) return;
         imagens.remove(imagem);
     }
 
+    public List<PijamaVariante> getVariantes() { return variantes; }
+    public void setVariantes(List<PijamaVariante> variantes) { this.variantes = variantes; }
 }

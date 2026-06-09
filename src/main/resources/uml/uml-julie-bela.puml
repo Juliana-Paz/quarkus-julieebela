@@ -1,14 +1,4 @@
-Aqui está o código completo:
-
-```plantuml
 @startuml Julie e Bela - E-commerce Pijamas Infantis
-
-' =====================================================
-' LEGENDA:
-'   [PROF]  = copiar direto do projeto do professor
-'   [ADAPT] = copiar e adaptar (trocar nomes/campos)
-'   [NOVO]  = criar do zero no mesmo padrão
-' =====================================================
 
 left to right direction
 
@@ -34,10 +24,6 @@ skinparam note {
   FontSize 10
 }
 
-' =====================================================
-' CAMADA 1 — BASE
-' =====================================================
-
 abstract class DefaultEntity {
   # id : Long
   # dataCadastro : LocalDateTime
@@ -47,26 +33,17 @@ abstract class DefaultEntity {
   + registrarDataAlteracao() : void
 }
 
-' =====================================================
-' CAMADA 2 — AUTH
-' =====================================================
-
 together {
   class Usuario {
     - username : String
     - senha : String
     - perfil : Perfil
   }
-
   enum Perfil {
     ADM
     USER
   }
 }
-
-' =====================================================
-' CAMADA 3 — CLIENTE
-' =====================================================
 
 together {
   class Cliente {
@@ -75,12 +52,10 @@ together {
     - email : String
     - dataNascimento : LocalDate
   }
-
   class Telefone <<Embeddable>> {
     - codigoArea : String
     - numero : String
   }
-
   class Endereco <<Embeddable>> {
     - logradouro : String
     - numero : String
@@ -93,22 +68,19 @@ together {
   }
 }
 
-' =====================================================
-' CAMADA 4 — CATÁLOGO
-' =====================================================
-
 together {
   class Pijama {
     - nome : String
     - descricao : String
     - preco : Double
     - modelo : String
-    - estoque : Integer
     - ativo : Boolean
-    - tamanho : Tamanho
     - sexo : SexoPijama
   }
-
+  class PijamaVariante {
+    - tamanho : Tamanho
+    - estoque : Integer
+  }
   class Arquivo {
     - fid : String
     - nomeOriginal : String
@@ -123,21 +95,17 @@ together {
     - nome : String
     - descricao : String
   }
-
   class Marca {
     - nome : String
     - descricao : String
   }
-
   class Estampa {
     - nome : String
   }
-
   class Cor {
     - nome : String
     - hexadecimal : String
   }
-
   class Material {
     - nome : String
     - descricao : String
@@ -160,7 +128,6 @@ together {
     DOZE_ANOS
     ADULTO
   }
-
   enum SexoPijama {
     FEMININO
     MASCULINO
@@ -168,15 +135,16 @@ together {
   }
 }
 
-' =====================================================
-' CAMADA 5 — E-COMMERCE
-' =====================================================
+class TokenRecuperacaoSenha {
+  - codigo : String
+  - expiracao : LocalDateTime
+  - usado : Boolean
+}
 
 together {
   class ListaDesejos {
     - dataCriacao : LocalDate
   }
-
   class CupomDesconto {
     - codigo : String
     - descricao : String
@@ -196,7 +164,6 @@ together {
     - status : StatusPedido
     - formaPagamento : FormaPagamento
   }
-
   class ItemPedido {
     - quantidade : Integer
     - precoUnitario : Double
@@ -213,22 +180,19 @@ together {
     ENTREGUE
     CANCELADO
   }
-
   enum FormaPagamento {
-    CARTAO_CREDITO
-    CARTAO_DEBITO
     PIX
     BOLETO
+    CARTAO_CREDITO
+    CARTAO_DEBITO
   }
 }
 
-' =====================================================
-' HERANÇA — todas herdam de DefaultEntity
-' =====================================================
-
+' HERANÇA
 DefaultEntity <|-- Usuario
 DefaultEntity <|-- Cliente
 DefaultEntity <|-- Pijama
+DefaultEntity <|-- PijamaVariante
 DefaultEntity <|-- Categoria
 DefaultEntity <|-- Marca
 DefaultEntity <|-- Estampa
@@ -239,98 +203,48 @@ DefaultEntity <|-- CupomDesconto
 DefaultEntity <|-- ListaDesejos
 DefaultEntity <|-- Pedido
 DefaultEntity <|-- ItemPedido
+DefaultEntity <|-- TokenRecuperacaoSenha
 
-' =====================================================
-' ASSOCIAÇÃO 1:1
-' Cliente tem exatamente 1 Usuario (conta)
-' =====================================================
-
+' 1:1
 Cliente "1" --> "1" Usuario : conta
 
-' =====================================================
-' ENUM — Usuario usa Perfil
-' =====================================================
-
+' ENUM
 Usuario --> Perfil : perfil
 
-' =====================================================
 ' COMPOSIÇÃO
-' Parte não existe sem o todo — losango cheio
-' =====================================================
-
-' Telefone só existe vinculado ao Cliente
 Cliente "1" *-- "0..*" Telefone : telefones
-
-' Endereco só existe vinculado ao Cliente
 Cliente "1" *-- "0..*" Endereco : enderecos
-
-' ItemPedido só existe dentro de um Pedido
 Pedido "1" *-- "1..*" ItemPedido : itens
+Pijama "1" *-- "1..*" PijamaVariante : variantes
 
-' =====================================================
 ' AGREGAÇÃO
-' Parte existe independente do todo — losango vazio
-' =====================================================
-
-' Arquivo existe no SeaweedFS independente do Pijama
 Pijama "1" o-- "0..*" Arquivo : imagens
-
-' Pijama existe independente da ListaDesejos
 ListaDesejos "1" o-- "0..*" Pijama : pijamas
 
-' =====================================================
-' ASSOCIAÇÃO N:1
-' Seta simples do lado N apontando para o lado 1
-' =====================================================
-
-' Pijama pertence a uma Categoria (obrigatório)
+' N:1
 Pijama "*" --> "1" Categoria : categoria
-
-' Pijama pertence a uma Marca (obrigatório)
 Pijama "*" --> "1" Marca : marca
-
-' Pijama pode ter uma Estampa (opcional)
 Pijama "*" --> "0..1" Estampa : estampa
-
-' ListaDesejos pertence a um Cliente
 ListaDesejos "*" --> "1" Cliente : dono
-
-' Pedido pertence a um Cliente
 Pedido "*" --> "1" Cliente : cliente
-
-' Pedido usa um Endereco do Cliente como entrega
 Pedido "*" --> "1" Endereco : enderecoEntrega
-
-' Pedido pode ter ou não um CupomDesconto
 Pedido "*" --> "0..1" CupomDesconto : cupom
-
-' ItemPedido referencia um Pijama
 ItemPedido "*" --> "1" Pijama : pijama
+ItemPedido "*" --> "0..1" PijamaVariante : variante
+TokenRecuperacaoSenha "*" --> "1" Usuario : usuario
+PijamaVariante "*" --> "0..1" Cor : cor
 
-' =====================================================
-' ASSOCIAÇÃO N:N
-' Losango vazio nos dois lados
-' Gera tabela intermediária no banco
-' =====================================================
+' Relação invisível para manter Cor ancorada perto de PijamaVariante
+Pijama -[hidden]- Cor
+Cor -[hidden]- Material
 
-' Um Pijama tem 1 ou muitas Cores
-' Uma Cor aparece em 0 ou muitos Pijamas
-' Tabela: pijama_cor
-Pijama "1..*" o--o "*" Cor : cores
-
-' Um Pijama tem 1 ou muitos Materiais
-' Um Material aparece em 0 ou muitos Pijamas
-' Tabela: pijama_material
+' N:N
 Pijama "1..*" o--o "*" Material : materiais
 
-' =====================================================
-' ENUMS do Pijama e Pedido
-' =====================================================
-
-Pijama --> Tamanho : tamanho
+' ENUMS
+PijamaVariante --> Tamanho : tamanho
 Pijama --> SexoPijama : sexo
 Pedido --> StatusPedido : status
 Pedido --> FormaPagamento : formaPagamento
 
 @enduml
-```

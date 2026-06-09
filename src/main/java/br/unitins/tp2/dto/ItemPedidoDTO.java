@@ -9,6 +9,8 @@ public record ItemPedidoDTO(
     @NotNull(message = "O pijama é obrigatório.")
     Long idPijama,
 
+    Long idVariante,
+
     @NotNull(message = "A quantidade é obrigatória.")
     @Positive(message = "A quantidade deve ser maior que zero.")
     @Min(value = 1, message = "A quantidade mínima é 1.")

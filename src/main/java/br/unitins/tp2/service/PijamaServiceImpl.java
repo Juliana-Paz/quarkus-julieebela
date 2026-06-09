@@ -1,19 +1,20 @@
 package br.unitins.tp2.service;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.io.InputStream;
 import java.util.HexFormat;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -24,8 +25,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import br.unitins.tp2.dto.PijamaDTO;
 import br.unitins.tp2.dto.PijamaResponseDTO;
+import br.unitins.tp2.dto.pijama.PijamaVarianteRequestDTO;
 import br.unitins.tp2.model.Arquivo;
+import br.unitins.tp2.model.Cor;
 import br.unitins.tp2.model.Pijama;
+import br.unitins.tp2.model.PijamaVariante;
 import br.unitins.tp2.model.SexoPijama;
 import br.unitins.tp2.model.Tamanho;
 import br.unitins.tp2.repository.ArquivoRepository;
@@ -35,6 +39,7 @@ import br.unitins.tp2.repository.EstampaRepository;
 import br.unitins.tp2.repository.MarcaRepository;
 import br.unitins.tp2.repository.MaterialRepository;
 import br.unitins.tp2.repository.PijamaRepository;
+import br.unitins.tp2.repository.PijamaVarianteRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -75,6 +80,9 @@ public class PijamaServiceImpl implements PijamaService {
     ArquivoRepository arquivoRepository;
 
     @Inject
+    PijamaVarianteRepository pijamaVarianteRepository;
+
+    @Inject
     ObjectMapper objectMapper;
 
     @Inject
@@ -95,6 +103,7 @@ public class PijamaServiceImpl implements PijamaService {
         Pijama entity = new Pijama();
         apply(dto, entity);
         pijamaRepository.persist(entity);
+        salvarVariantes(entity, dto.variantes());
         return PijamaResponseDTO.valueOf(entity);
     }
 
@@ -105,6 +114,7 @@ public class PijamaServiceImpl implements PijamaService {
         Pijama entity = pijamaRepository.findById(id);
         if (entity == null) throw new NotFoundException("Pijama não encontrado.");
         apply(dto, entity);
+        salvarVariantes(entity, dto.variantes());
         return PijamaResponseDTO.valueOf(entity);
     }
 
@@ -240,21 +250,11 @@ public class PijamaServiceImpl implements PijamaService {
         entity.setDescricao(safeTrim(dto.descricao()));
         entity.setPreco(dto.preco());
         entity.setModelo(safeTrim(dto.modelo()));
-        entity.setEstoque(dto.estoque());
         entity.setAtivo(dto.ativo());
-        entity.setTamanho(Tamanho.valueOf(dto.idTamanho()));
         entity.setSexo(SexoPijama.valueOf(dto.idSexo()));
         entity.setCategoria(categoriaRepository.findById(dto.idCategoria()));
         entity.setMarca(marcaRepository.findById(dto.idMarca()));
         entity.setEstampa(dto.idEstampa() != null ? estampaRepository.findById(dto.idEstampa()) : null);
-
-        entity.getCores().clear();
-        if (dto.idsCores() != null) {
-            dto.idsCores().forEach(cid -> {
-                var cor = corRepository.findById(cid);
-                if (cor != null) entity.getCores().add(cor);
-            });
-        }
 
         entity.getMateriais().clear();
         if (dto.idsMateriais() != null) {
@@ -262,6 +262,39 @@ public class PijamaServiceImpl implements PijamaService {
                 var mat = materialRepository.findById(mid);
                 if (mat != null) entity.getMateriais().add(mat);
             });
+        }
+    }
+
+    private void salvarVariantes(Pijama pijama, List<PijamaVarianteRequestDTO> variantesDTO) {
+        pijama.getVariantes().clear();
+        if (variantesDTO == null || variantesDTO.isEmpty()) return;
+
+        for (PijamaVarianteRequestDTO dto : variantesDTO) {
+            Tamanho tamanho;
+            try {
+                tamanho = Tamanho.valueOf(dto.idTamanho());
+            } catch (IllegalArgumentException e) {
+                throw new WebApplicationException(
+                    Response.status(400)
+                        .entity(Map.of("message", "Tamanho inválido: " + dto.idTamanho()))
+                        .build());
+            }
+
+            PijamaVariante variante = new PijamaVariante();
+            variante.setPijama(pijama);
+            variante.setTamanho(tamanho);
+            variante.setEstoque(dto.estoque());
+
+            if (dto.idCor() != null) {
+                Cor cor = corRepository.findById(dto.idCor());
+                if (cor == null) throw new WebApplicationException(
+                    Response.status(400)
+                        .entity(Map.of("message", "Cor não encontrada: " + dto.idCor()))
+                        .build());
+                variante.setCor(cor);
+            }
+
+            pijama.getVariantes().add(variante);
         }
     }
 
@@ -427,5 +460,4 @@ public class PijamaServiceImpl implements PijamaService {
         JsonNode value = node.get(field);
         return value == null || value.isNull() ? null : value.asText();
     }
-
 }

@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import br.unitins.tp2.dto.PedidoDTO;
@@ -16,11 +17,13 @@ import br.unitins.tp2.model.FormaPagamento;
 import br.unitins.tp2.model.ItemPedido;
 import br.unitins.tp2.model.Pedido;
 import br.unitins.tp2.model.Pijama;
+import br.unitins.tp2.model.PijamaVariante;
 import br.unitins.tp2.model.StatusPedido;
 import br.unitins.tp2.repository.ClienteRepository;
 import br.unitins.tp2.repository.CupomRepository;
 import br.unitins.tp2.repository.PedidoRepository;
 import br.unitins.tp2.repository.PijamaRepository;
+import br.unitins.tp2.repository.PijamaVarianteRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -28,6 +31,8 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Validator;
 import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.Response;
 
 @ApplicationScoped
 public class PedidoServiceImpl implements PedidoService {
@@ -40,6 +45,9 @@ public class PedidoServiceImpl implements PedidoService {
 
     @Inject
     PijamaRepository pijamaRepository;
+
+    @Inject
+    PijamaVarianteRepository pijamaVarianteRepository;
 
     @Inject
     CupomRepository cupomRepository;
@@ -89,6 +97,26 @@ public class PedidoServiceImpl implements PedidoService {
             item.setPrecoUnitario(pijama.getPreco());
             item.setSubtotal(subtotal);
             item.setPijama(pijama);
+
+            if (itemDto.idVariante() != null) {
+                PijamaVariante variante = pijamaVarianteRepository.findById(itemDto.idVariante());
+                if (variante == null) {
+                    throw new WebApplicationException(Response.status(400)
+                        .entity(Map.of("message", "Variante não encontrada."))
+                        .build());
+                }
+                if (variante.getEstoque() < itemDto.quantidade()) {
+                    throw new WebApplicationException(Response.status(400)
+                        .entity(Map.of("message",
+                            "Estoque insuficiente para: "
+                            + variante.getTamanho().getNome()
+                            + (variante.getCor() != null ? " / " + variante.getCor().getNome() : "")))
+                        .build());
+                }
+                variante.setEstoque(variante.getEstoque() - itemDto.quantidade());
+                item.setVariante(variante);
+            }
+
             itens.add(item);
         }
 
@@ -173,5 +201,4 @@ public class PedidoServiceImpl implements PedidoService {
         Set<ConstraintViolation<PedidoDTO>> violations = validator.validate(dto);
         if (!violations.isEmpty()) throw new ConstraintViolationException(violations);
     }
-
 }
