@@ -77,60 +77,94 @@ INSERT INTO material (nome, descricao) VALUES ('Fleece',  'Tecido quentinho, ide
 
 -- ============================================================
 -- 9. PIJAMAS
--- Tamanho: RN=1|1-3m=2|3-6m=3|6-9m=4|1ano=5|2anos=6|3anos=7
---          4anos=8|6anos=9|8anos=10|10anos=11|12anos=12|Adulto=13
 -- Sexo: FEMININO=1 | MASCULINO=2 | UNISSEX=3
 -- ============================================================
-INSERT INTO pijama (nome, descricao, preco, modelo, estoque, ativo, tamanho, sexo, categoria_id, marca_id, estampa_id)
+INSERT INTO pijama (nome, descricao, preco, modelo, ativo, sexo, categoria_id, marca_id, estampa_id)
 VALUES ('Pijama Unicórnio Rosa',
         'Pijama manga longa com estampa de unicórnios mágicos, em algodão premium',
-        79.90, 'Manga Longa', 50, true, 8, 1, 1, 1, 1);
+        79.90, 'Manga Longa', true, 1, 1, 1, 1);
 
-INSERT INTO pijama (nome, descricao, preco, modelo, estoque, ativo, tamanho, sexo, categoria_id, marca_id, estampa_id)
+INSERT INTO pijama (nome, descricao, preco, modelo, ativo, sexo, categoria_id, marca_id, estampa_id)
 VALUES ('Pijama Estrelas Lilás',
         'Pijama manga curta com estrelinhas brilhantes, perfeito para o verão',
-        89.90, 'Manga Curta', 40, true, 9, 1, 1, 1, 3);
+        89.90, 'Manga Curta', true, 1, 1, 1, 3);
 
-INSERT INTO pijama (nome, descricao, preco, modelo, estoque, ativo, tamanho, sexo, categoria_id, marca_id, estampa_id)
+INSERT INTO pijama (nome, descricao, preco, modelo, ativo, sexo, categoria_id, marca_id, estampa_id)
 VALUES ('Pijama Dinossauro',
         'Pijama manga longa temático de dinossauros, ideal para os pequenos aventureiros',
-        79.90, 'Manga Longa', 45, true, 8, 2, 2, 2, 2);
+        79.90, 'Manga Longa', true, 2, 2, 2, 2);
 
-INSERT INTO pijama (nome, descricao, preco, modelo, estoque, ativo, tamanho, sexo, categoria_id, marca_id, estampa_id)
+INSERT INTO pijama (nome, descricao, preco, modelo, ativo, sexo, categoria_id, marca_id, estampa_id)
 VALUES ('Pijama Liso Azul',
         'Pijama masculino liso em malha premium, clássico e confortável',
-        69.90, 'Manga Curta', 60, true, 9, 2, 2, 2, 4);
+        69.90, 'Manga Curta', true, 2, 2, 2, 4);
 
-INSERT INTO pijama (nome, descricao, preco, modelo, estoque, ativo, tamanho, sexo, categoria_id, marca_id, estampa_id)
+INSERT INTO pijama (nome, descricao, preco, modelo, ativo, sexo, categoria_id, marca_id, estampa_id)
 VALUES ('Pijama Unissex Estrelas',
         'Pijama unissex com estampa de estrelas, perfeito para presentear',
-        84.90, 'Manga Longa', 35, true, 6, 3, 3, 3, 3);
+        84.90, 'Manga Longa', true, 3, 3, 3, 3);
+
+INSERT INTO pijama (nome, descricao, preco, modelo, ativo, sexo, categoria_id, marca_id, estampa_id)
+VALUES ('Pijama Fleece Lilás',
+        'Pijama quentinho de fleece para noites frias, disponível em lilás e rosa',
+        94.90, 'Manga Longa', true, 1, 1, 1, 4);
+
+INSERT INTO pijama (nome, descricao, preco, modelo, ativo, sexo, categoria_id, marca_id, estampa_id)
+VALUES ('Pijama Body Recém-Nascido',
+        'Body macio em algodão premium para recém-nascidos, com estampa de unicórnios',
+        59.90, 'Body', true, 3, 3, 3, 1);
 
 -- ============================================================
--- 10. PIJAMA × COR
+-- 10. PIJAMA × MATERIAL
 -- ============================================================
-INSERT INTO pijama_cor (pijama_id, cor_id) VALUES (1, 1); -- Unicórnio  → Rosa
-INSERT INTO pijama_cor (pijama_id, cor_id) VALUES (1, 5); -- Unicórnio  → Roxo
-INSERT INTO pijama_cor (pijama_id, cor_id) VALUES (2, 1); -- Estrelas   → Rosa
-INSERT INTO pijama_cor (pijama_id, cor_id) VALUES (2, 3); -- Estrelas   → Amarelo
-INSERT INTO pijama_cor (pijama_id, cor_id) VALUES (3, 2); -- Dinossauro → Azul
-INSERT INTO pijama_cor (pijama_id, cor_id) VALUES (3, 4); -- Dinossauro → Branco
-INSERT INTO pijama_cor (pijama_id, cor_id) VALUES (4, 2); -- Liso Azul  → Azul
-INSERT INTO pijama_cor (pijama_id, cor_id) VALUES (5, 3); -- Unissex    → Amarelo
-INSERT INTO pijama_cor (pijama_id, cor_id) VALUES (5, 4); -- Unissex    → Branco
+INSERT INTO pijama_material (pijama_id, material_id) VALUES (1, 1); -- Unicórnio Rosa   → Algodão
+INSERT INTO pijama_material (pijama_id, material_id) VALUES (1, 2); -- Unicórnio Rosa   → Malha
+INSERT INTO pijama_material (pijama_id, material_id) VALUES (2, 1); -- Estrelas Lilás   → Algodão
+INSERT INTO pijama_material (pijama_id, material_id) VALUES (3, 1); -- Dinossauro       → Algodão
+INSERT INTO pijama_material (pijama_id, material_id) VALUES (3, 2); -- Dinossauro       → Malha
+INSERT INTO pijama_material (pijama_id, material_id) VALUES (4, 2); -- Liso Azul        → Malha
+INSERT INTO pijama_material (pijama_id, material_id) VALUES (4, 3); -- Liso Azul        → Fleece
+INSERT INTO pijama_material (pijama_id, material_id) VALUES (5, 1); -- Unissex Estrelas → Algodão
+INSERT INTO pijama_material (pijama_id, material_id) VALUES (5, 2); -- Unissex Estrelas → Malha
+INSERT INTO pijama_material (pijama_id, material_id) VALUES (6, 3); -- Fleece Lilás     → Fleece
+INSERT INTO pijama_material (pijama_id, material_id) VALUES (7, 1); -- Body RN          → Algodão
 
 -- ============================================================
--- 11. PIJAMA × MATERIAL
+-- 11. PIJAMA × VARIANTE
+-- Pijamas 1, 2, 3, 6: COM cor | Pijamas 4, 5, 7: SEM cor
 -- ============================================================
-INSERT INTO pijama_material (pijama_id, material_id) VALUES (1, 1); -- Unicórnio  → Algodão
-INSERT INTO pijama_material (pijama_id, material_id) VALUES (1, 2); -- Unicórnio  → Malha
-INSERT INTO pijama_material (pijama_id, material_id) VALUES (2, 1); -- Estrelas   → Algodão
-INSERT INTO pijama_material (pijama_id, material_id) VALUES (3, 1); -- Dinossauro → Algodão
-INSERT INTO pijama_material (pijama_id, material_id) VALUES (3, 2); -- Dinossauro → Malha
-INSERT INTO pijama_material (pijama_id, material_id) VALUES (4, 2); -- Liso Azul  → Malha
-INSERT INTO pijama_material (pijama_id, material_id) VALUES (4, 3); -- Liso Azul  → Fleece
-INSERT INTO pijama_material (pijama_id, material_id) VALUES (5, 1); -- Unissex    → Algodão
-INSERT INTO pijama_material (pijama_id, material_id) VALUES (5, 2); -- Unissex    → Malha
+INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (1, 'QUATRO_ANOS', 1, 10);
+INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (1, 'SEIS_ANOS',   1,  8);
+INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (1, 'QUATRO_ANOS', 5,  5);
+INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (1, 'SEIS_ANOS',   5,  3);
+
+INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (2, 'SEIS_ANOS',   1, 12);
+INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (2, 'OITO_ANOS',   1,  8);
+INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (2, 'SEIS_ANOS',   3,  6);
+INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (2, 'OITO_ANOS',   3,  4);
+
+INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (3, 'QUATRO_ANOS', 2, 10);
+INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (3, 'SEIS_ANOS',   2,  8);
+INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (3, 'OITO_ANOS',   2,  6);
+INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (3, 'QUATRO_ANOS', 4,  5);
+INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (3, 'SEIS_ANOS',   4,  3);
+
+INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (4, 'SEIS_ANOS',   null, 15);
+INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (4, 'OITO_ANOS',   null, 12);
+INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (4, 'DEZ_ANOS',    null,  8);
+
+INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (5, 'DOIS_ANOS',   null, 10);
+INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (5, 'TRES_ANOS',   null,  8);
+INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (5, 'QUATRO_ANOS', null,  6);
+
+INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (6, 'SEIS_ANOS',   1,  8);
+INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (6, 'OITO_ANOS',   1,  6);
+INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (6, 'SEIS_ANOS',   5,  5);
+INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (6, 'OITO_ANOS',   5,  4);
+
+INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (7, 'RN',                null, 15);
+INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (7, 'UM_A_TRES_MESES',   null, 12);
+INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (7, 'TRES_A_SEIS_MESES', null,  8);
 
 -- ============================================================
 -- 12. CLIENTE  (vinculado ao usuario id=2 / cliente1)

@@ -143,6 +143,25 @@ public class ClienteServiceImpl implements ClienteService {
 
     @Override
     @Transactional
+    public ClienteResponseDTO atualizarEndereco(Long id, int index, EnderecoDTO dto) {
+        Cliente cliente = clienteRepository.findById(id);
+        if (cliente == null) throw new NotFoundException("Cliente não encontrado.");
+        if (index < 0 || index >= cliente.getEnderecos().size())
+            throw ValidationException.of("index", "Índice de endereço inválido.");
+        Endereco e = cliente.getEnderecos().get(index);
+        e.setLogradouro(dto.logradouro());
+        e.setNumero(dto.numero());
+        e.setComplemento(dto.complemento());
+        e.setBairro(dto.bairro());
+        e.setCep(dto.cep());
+        e.setMunicipio(dto.municipio());
+        e.setEstado(dto.estado());
+        e.setPrincipal(dto.principal());
+        return ClienteResponseDTO.valueOf(cliente);
+    }
+
+    @Override
+    @Transactional
     public ClienteResponseDTO removerEndereco(Long id, int index) {
         Cliente cliente = clienteRepository.findById(id);
         if (cliente == null) throw new NotFoundException("Cliente não encontrado.");

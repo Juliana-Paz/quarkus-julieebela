@@ -8,7 +8,9 @@ public record ArquivoResponseDTO(
     String nomeOriginal,
     String mimeType,
     Long tamanhoBytes,
-    String sha256
+    String sha256,
+    Integer ordem,
+    Boolean capa
 ) {
     public static ArquivoResponseDTO valueOf(Arquivo arquivo) {
         return new ArquivoResponseDTO(
@@ -17,7 +19,9 @@ public record ArquivoResponseDTO(
             arquivo.getNomeOriginal(),
             arquivo.getMimeType(),
             arquivo.getTamanhoBytes(),
-            arquivo.getSha256()
+            arquivo.getSha256(),
+            arquivo.getOrdem() != null ? arquivo.getOrdem() : 0,
+            arquivo.getCapa() != null ? arquivo.getCapa() : false
         );
     }
 }

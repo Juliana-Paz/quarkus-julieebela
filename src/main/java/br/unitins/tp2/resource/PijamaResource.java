@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import br.unitins.tp2.dto.PijamaDTO;
 import br.unitins.tp2.dto.PijamaResponseDTO;
+import br.unitins.tp2.dto.arquivo.ReordenarImagemDTO;
 import br.unitins.tp2.dto.pijama.PijamaVarianteRequestDTO;
 import br.unitins.tp2.service.ArquivoDownload;
 import br.unitins.tp2.service.PijamaService;
@@ -236,6 +237,18 @@ public class PijamaResource {
     public Response removerImagem(@PathParam("id") Long id, @PathParam("fid") String fid) {
         service.removerImagem(fid);
         return Response.noContent().build();
+    }
+
+    @PATCH
+    @Path("/{id: \\d+}/imagens/reordenar")
+    @RolesAllowed("Adm")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response reordenarImagens(
+            @PathParam("id") Long id,
+            List<ReordenarImagemDTO> ordens) {
+        service.reordenarImagens(id, ordens);
+        return Response.ok().build();
     }
 
     private List<PijamaVarianteRequestDTO> parseVariantes(String json) {

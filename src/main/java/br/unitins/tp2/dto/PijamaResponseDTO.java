@@ -1,5 +1,6 @@
 package br.unitins.tp2.dto;
 
+import java.util.Comparator;
 import java.util.List;
 
 import br.unitins.tp2.dto.pijama.PijamaVarianteResponseDTO;
@@ -37,7 +38,11 @@ public record PijamaResponseDTO(
                 ? p.getMateriais().stream().map(MaterialResponseDTO::valueOf).toList()
                 : List.of(),
             p.getImagens() != null
-                ? p.getImagens().stream().map(ArquivoResponseDTO::valueOf).toList()
+                ? p.getImagens().stream()
+                    .sorted(Comparator.comparingInt(a ->
+                        a.getOrdem() != null ? a.getOrdem() : 0))
+                    .map(ArquivoResponseDTO::valueOf)
+                    .toList()
                 : List.of(),
             p.getVariantes() != null
                 ? p.getVariantes().stream().map(PijamaVarianteResponseDTO::valueOf).toList()

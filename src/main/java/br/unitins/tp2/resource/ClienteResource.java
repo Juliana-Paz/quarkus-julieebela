@@ -83,6 +83,15 @@ public class ClienteResource {
         return Response.ok(service.adicionarEndereco(me.id(), dto)).build();
     }
 
+    @PATCH
+    @Path("/me/enderecos/{index: \\d+}")
+    @Authenticated
+    public Response atualizarEndereco(@PathParam("index") int index, @Valid EnderecoDTO dto) {
+        String username = jwt.getSubject();
+        ClienteResponseDTO me = service.findByUsername(username);
+        return Response.ok(service.atualizarEndereco(me.id(), index, dto)).build();
+    }
+
     @DELETE
     @Path("/me/enderecos/{index: \\d+}")
     @Authenticated

@@ -21,6 +21,12 @@ public class Arquivo extends DefaultEntity {
     @Column(nullable = false, length = 64)
     private String sha256;
 
+    @Column(nullable = false, columnDefinition = "integer default 0")
+    private Integer ordem = 0;
+
+    @Column(nullable = false, columnDefinition = "boolean default false")
+    private Boolean capa = false;
+
     public String getFid() {
         return fid;
     }
@@ -60,4 +66,10 @@ public class Arquivo extends DefaultEntity {
     public void setSha256(String sha256) {
         this.sha256 = sha256;
     }
+
+    public Integer getOrdem() { return ordem; }
+    public void setOrdem(Integer ordem) { this.ordem = ordem; }
+
+    public Boolean getCapa() { return capa; }
+    public void setCapa(Boolean capa) { this.capa = capa; }
 }

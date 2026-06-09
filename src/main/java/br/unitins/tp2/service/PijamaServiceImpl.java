@@ -25,6 +25,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import br.unitins.tp2.dto.PijamaDTO;
 import br.unitins.tp2.dto.PijamaResponseDTO;
+import br.unitins.tp2.dto.arquivo.ReordenarImagemDTO;
 import br.unitins.tp2.dto.pijama.PijamaVarianteRequestDTO;
 import br.unitins.tp2.model.Arquivo;
 import br.unitins.tp2.model.Cor;
@@ -243,6 +244,23 @@ public class PijamaServiceImpl implements PijamaService {
         deletarNoSeaweedBestEffort(fid);
         pijamaRepository.findByArquivoId(arquivo.getId()).ifPresent(p -> p.removeImagem(arquivo));
         arquivoRepository.delete(arquivo);
+    }
+
+    @Override
+    @Transactional
+    public void reordenarImagens(Long pijamaId, List<ReordenarImagemDTO> ordens) {
+        Pijama pijama = pijamaRepository.findById(pijamaId);
+        if (pijama == null) throw new WebApplicationException(
+                Response.status(404).build());
+        for (ReordenarImagemDTO dto : ordens) {
+            pijama.getImagens().stream()
+                    .filter(a -> a.getId().equals(dto.arquivoId()))
+                    .findFirst()
+                    .ifPresent(a -> {
+                        a.setOrdem(dto.ordem());
+                        a.setCapa(dto.capa());
+                    });
+        }
     }
 
     private void apply(PijamaDTO dto, Pijama entity) {

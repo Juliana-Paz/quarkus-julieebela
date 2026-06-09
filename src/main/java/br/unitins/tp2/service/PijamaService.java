@@ -7,6 +7,7 @@ import org.jboss.resteasy.reactive.multipart.FileUpload;
 
 import br.unitins.tp2.dto.PijamaDTO;
 import br.unitins.tp2.dto.PijamaResponseDTO;
+import br.unitins.tp2.dto.arquivo.ReordenarImagemDTO;
 
 public interface PijamaService {
 
@@ -35,5 +36,7 @@ public interface PijamaService {
     ArquivoDownload downloadImagem(String fid);
 
     void removerImagem(String fid);
+
+    void reordenarImagens(Long pijamaId, List<ReordenarImagemDTO> ordens);
 
 }

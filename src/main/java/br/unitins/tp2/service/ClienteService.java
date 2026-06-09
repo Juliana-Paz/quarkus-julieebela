@@ -21,6 +21,8 @@ public interface ClienteService {
 
     ClienteResponseDTO adicionarEndereco(Long id, EnderecoDTO dto);
 
+    ClienteResponseDTO atualizarEndereco(Long id, int index, EnderecoDTO dto);
+
     ClienteResponseDTO removerEndereco(Long id, int index);
 
     ClienteResponseDTO adicionarTelefone(Long id, TelefoneDTO dto);
