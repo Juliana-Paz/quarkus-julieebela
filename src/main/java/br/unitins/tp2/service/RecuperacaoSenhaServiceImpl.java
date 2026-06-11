@@ -4,6 +4,7 @@ import br.unitins.tp2.dto.recuperacao.RedefinirSenhaDTO;
 import br.unitins.tp2.dto.recuperacao.SolicitarRecuperacaoDTO;
 import br.unitins.tp2.dto.recuperacao.TokenTemporarioDTO;
 import br.unitins.tp2.dto.recuperacao.VerificarCodigoDTO;
+import br.unitins.tp2.exception.NotFoundException;
 import br.unitins.tp2.exception.ValidationException;
 import br.unitins.tp2.model.Cliente;
 import br.unitins.tp2.model.TokenRecuperacaoSenha;
@@ -43,8 +44,7 @@ public class RecuperacaoSenhaServiceImpl implements RecuperacaoSenhaService {
     public void solicitarRecuperacao(SolicitarRecuperacaoDTO dto) {
         Cliente cliente = clienteRepository.findByEmail(dto.email());
         if (cliente == null) {
-            // Não revelamos se o e-mail existe ou não (segurança)
-            return;
+            throw new NotFoundException("Nenhuma conta encontrada com este e-mail.");
         }
 
         tokenRepository.invalidarTokensAnteriores(cliente.getUsuario().getId());
