@@ -5,19 +5,21 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
 public enum Tamanho {
 
-    RN(1, "Recém-Nascido"),
-    UM_A_TRES_MESES(2, "1 a 3 Meses"),
-    TRES_A_SEIS_MESES(3, "3 a 6 Meses"),
-    SEIS_A_NOVE_MESES(4, "6 a 9 Meses"),
-    UM_ANO(5, "1 Ano"),
-    DOIS_ANOS(6, "2 Anos"),
-    TRES_ANOS(7, "3 Anos"),
-    QUATRO_ANOS(8, "4 Anos"),
-    SEIS_ANOS(9, "6 Anos"),
-    OITO_ANOS(10, "8 Anos"),
-    DEZ_ANOS(11, "10 Anos"),
-    DOZE_ANOS(12, "12 Anos"),
-    ADULTO(13, "Adulto");
+    RN(1, "RN"),
+    P(2, "P"),
+    M(3, "M"),
+    G(4, "G"),
+    GG(5, "GG"),
+    XG(6, "XG"),
+    ADULTO(7, "Adulto"),
+    UM_ANO(8, "1"),
+    DOIS_ANOS(9, "2"),
+    QUATRO_ANOS(10, "4"),
+    SEIS_ANOS(11, "6"),
+    OITO_ANOS(12, "8"),
+    DEZ_ANOS(13, "10"),
+    DOZE_ANOS(14, "12"),
+    DEZESSEIS_ANOS(15, "16");
 
     private final Integer id;
     private final String nome;
