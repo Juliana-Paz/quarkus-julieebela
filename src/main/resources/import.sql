@@ -1,493 +1,614 @@
 -- ============================================================
--- Julie e Bela — Seed de desenvolvimento
--- Ordem: respeita FKs (pai antes de filho)
+-- import.sql — Ateliê Julie & Bela
+-- Gerado para Quarkus 3 + Hibernate 6 (PhysicalNamingStrategyStandardImpl)
+-- Nomes de tabela: tudo minúsculo, sem underscores (ex: pijamavariante)
+-- Enums via Converter: INTEGER no banco (exceto Tamanho: VARCHAR)
+-- Senhas: PBKDF2WithHmacSHA512 + salt #blahxyz17
 -- ============================================================
 
--- ============================================================
--- 1. ESTADOS (domínio do professor — mantidos)
--- ============================================================
-INSERT INTO estado (nome, sigla, regiao) VALUES ('Tocantins',          'TO', 2);
-INSERT INTO estado (nome, sigla, regiao) VALUES ('São Paulo',          'SP', 4);
-INSERT INTO estado (nome, sigla, regiao) VALUES ('Goiás',              'GO', 1);
-INSERT INTO estado (nome, sigla, regiao) VALUES ('Rio Grande do Sul',  'RS', 5);
-INSERT INTO estado (nome, sigla, regiao) VALUES ('Rio de Janeiro',     'RJ', 4);
+-- ------------------------------------------------------------
+-- MARCA
+-- ------------------------------------------------------------
+INSERT INTO marca (id, nome, descricao, datacadastro, dataalteracao) VALUES
+(1, 'Ateliê Julie & Bela', 'Marca exclusiva de pijamas infantis e família com carinho e qualidade', NOW(), NOW());
+
+-- ------------------------------------------------------------
+-- CATEGORIA
+-- ------------------------------------------------------------
+INSERT INTO categoria (id, nome, descricao, datacadastro, dataalteracao) VALUES
+(1,  'Body Bebê',        'Bodies para recém-nascidos e bebês',                     NOW(), NOW()),
+(2,  'Macacão',          'Macacões para bebês e crianças pequenas',                NOW(), NOW()),
+(3,  'Pijama Infantil',  'Pijamas para crianças de 1 a 10 anos',                  NOW(), NOW()),
+(4,  'Pijama Juvenil',   'Pijamas para crianças maiores e adolescentes',           NOW(), NOW()),
+(5,  'Pijama Adulto',    'Pijamas confortáveis para adultos',                      NOW(), NOW()),
+(6,  'Pijama Família',   'Conjuntos combinando para toda a família',               NOW(), NOW()),
+(7,  'Coleção Natal',    'Pijamas temáticos natalinos para todas as idades',       NOW(), NOW());
+
+-- ------------------------------------------------------------
+-- COR
+-- ------------------------------------------------------------
+INSERT INTO cor (id, nome, hexadecimal, datacadastro, dataalteracao) VALUES
+(1,  'Rosa',        '#FFB6C1', NOW(), NOW()),
+(2,  'Lilás',       '#C8A2C8', NOW(), NOW()),
+(3,  'Azul',        '#AED6F1', NOW(), NOW()),
+(4,  'Azul Marinho','#1B2A4A', NOW(), NOW()),
+(5,  'Branco',      '#FFFFFF', NOW(), NOW()),
+(6,  'Cinza',       '#AAAAAA', NOW(), NOW()),
+(7,  'Bege',        '#F5F0E8', NOW(), NOW()),
+(8,  'Vermelho',    '#E74C3C', NOW(), NOW()),
+(9,  'Verde',       '#58D68D', NOW(), NOW()),
+(10, 'Amarelo',     '#F9E79F', NOW(), NOW());
+
+-- ------------------------------------------------------------
+-- MATERIAL
+-- ------------------------------------------------------------
+INSERT INTO material (id, nome, descricao, datacadastro, dataalteracao) VALUES
+(1, 'Algodão',     '100% algodão, suave e respirável',                    NOW(), NOW()),
+(2, 'Suedine',     'Tecido macio e quentinho, ideal para bebês',          NOW(), NOW()),
+(3, 'Cotton',      'Cotton penteado de alta qualidade',                   NOW(), NOW()),
+(4, 'Flanela',     'Flanela quente para noites frias',                    NOW(), NOW()),
+(5, 'Microfibra',  'Microfibra ultramacia e de secagem rápida',           NOW(), NOW());
+
+-- ------------------------------------------------------------
+-- ESTAMPA
+-- ------------------------------------------------------------
+INSERT INTO estampa (id, nome, datacadastro, dataalteracao) VALUES
+(1,  'Unicórnio',    NOW(), NOW()),
+(2,  'Dinossauro',   NOW(), NOW()),
+(3,  'Ursinho',      NOW(), NOW()),
+(4,  'Astronauta',   NOW(), NOW()),
+(5,  'Arco-íris',    NOW(), NOW()),
+(6,  'Flores',       NOW(), NOW()),
+(7,  'Corações',     NOW(), NOW()),
+(8,  'Estrelas',     NOW(), NOW()),
+(9,  'Xadrez',       NOW(), NOW()),
+(10, 'Natal',        NOW(), NOW()),
+(11, 'Liso',         NOW(), NOW());
+
+-- ------------------------------------------------------------
+-- ESTADO (Tocantins + alguns para endereços de clientes)
+-- regiao: 1=Centro-Oeste 2=Norte 3=Nordeste 4=Sudeste 5=Sul
+-- ------------------------------------------------------------
+INSERT INTO estado (id, nome, sigla, regiao, datacadastro, dataalteracao) VALUES
+(1,  'Tocantins',       'TO', 2, NOW(), NOW()),
+(2,  'São Paulo',       'SP', 4, NOW(), NOW()),
+(3,  'Minas Gerais',    'MG', 4, NOW(), NOW()),
+(4,  'Rio de Janeiro',  'RJ', 4, NOW(), NOW()),
+(5,  'Goiás',           'GO', 1, NOW(), NOW());
+
+-- ------------------------------------------------------------
+-- MUNICÍPIO
+-- ------------------------------------------------------------
+INSERT INTO municipio (id, nome, id_estado, datacadastro, dataalteracao) VALUES
+(1,  'Palmas',              1, NOW(), NOW()),
+(2,  'Araguaína',           1, NOW(), NOW()),
+(3,  'São Paulo',           2, NOW(), NOW()),
+(4,  'Belo Horizonte',      3, NOW(), NOW()),
+(5,  'Rio de Janeiro',      4, NOW(), NOW());
+
+-- ------------------------------------------------------------
+-- USUARIO
+-- perfil: 1=Adm, 2=User
+-- senhas PBKDF2WithHmacSHA512 + salt #blahxyz17
+--   admin123  → SYu34Plo5KZGE9fMtUK9LRPnWC3WvVpogVg35bf5tPYMM6dxXNV6AWmPEQzOLc110uIwcv8TOigbaCB43f8KHQ==
+--   123456    → 0cctg7WgpEz7kC/AzVC+KX+bZLPXDtgJDqWWZWnmzHH+7Na2YVxYYSFPxcf7ImAjqfNckx0aT4n5qKM7WEoeEQ==
+-- ------------------------------------------------------------
+INSERT INTO usuario (id, nome, username, senha, perfil, datacadastro, dataalteracao) VALUES
+(1, 'Administrador',  'admin',    'SYu34Plo5KZGE9fMtUK9LRPnWC3WvVpogVg35bf5tPYMM6dxXNV6AWmPEQzOLc110uIwcv8TOigbaCB43f8KHQ==', 1, NOW(), NOW()),
+(2, 'Ana Lima',       'ana',      '0cctg7WgpEz7kC/AzVC+KX+bZLPXDtgJDqWWZWnmzHH+7Na2YVxYYSFPxcf7ImAjqfNckx0aT4n5qKM7WEoeEQ==', 2, NOW(), NOW()),
+(3, 'Bruno Souza',    'bruno',    '0cctg7WgpEz7kC/AzVC+KX+bZLPXDtgJDqWWZWnmzHH+7Na2YVxYYSFPxcf7ImAjqfNckx0aT4n5qKM7WEoeEQ==', 2, NOW(), NOW()),
+(4, 'Carla Mendes',   'carla',    '0cctg7WgpEz7kC/AzVC+KX+bZLPXDtgJDqWWZWnmzHH+7Na2YVxYYSFPxcf7ImAjqfNckx0aT4n5qKM7WEoeEQ==', 2, NOW(), NOW()),
+(5, 'Daniel Costa',   'daniel',   '0cctg7WgpEz7kC/AzVC+KX+bZLPXDtgJDqWWZWnmzHH+7Na2YVxYYSFPxcf7ImAjqfNckx0aT4n5qKM7WEoeEQ==', 2, NOW(), NOW());
+
+-- ------------------------------------------------------------
+-- CLIENTE
+-- ------------------------------------------------------------
+INSERT INTO cliente (id, nome, cpf, email, data_nascimento, usuario_id, datacadastro, dataalteracao) VALUES
+(1, 'Ana Lima',     '11122233344', 'ana@email.com',    '1990-03-15', 2, NOW(), NOW()),
+(2, 'Bruno Souza',  '22233344455', 'bruno@email.com',  '1985-07-22', 3, NOW(), NOW()),
+(3, 'Carla Mendes', '33344455566', 'carla@email.com',  '1993-11-08', 4, NOW(), NOW()),
+(4, 'Daniel Costa', '44455566677', 'daniel@email.com', '1988-01-30', 5, NOW(), NOW());
+
+-- ------------------------------------------------------------
+-- CLIENTE TELEFONE
+-- ------------------------------------------------------------
+INSERT INTO cliente_telefone (cliente_id, codigo_area, numero) VALUES
+(1, '63', '991234567'),
+(2, '11', '987654321'),
+(3, '31', '996543210'),
+(4, '21', '998877665');
+
+-- ------------------------------------------------------------
+-- CLIENTE ENDEREÇO
+-- ------------------------------------------------------------
+INSERT INTO cliente_endereco (cliente_id, logradouro, numero, complemento, bairro, cep, municipio, estado, principal) VALUES
+(1, 'Quadra 103 Sul Rua SE 03', '15',  'Apto 202',  'Plano Diretor Sul', '77020-014', 'Palmas',           'Tocantins',    true),
+(2, 'Rua das Flores',           '200', NULL,         'Jardim Paulista',   '01310-000', 'São Paulo',         'São Paulo',    true),
+(3, 'Av. Afonso Pena',          '500', 'Sala 10',    'Centro',            '30130-001', 'Belo Horizonte',    'Minas Gerais', true),
+(4, 'Rua da Praia',             '77',  'Casa',       'Copacabana',        '22070-011', 'Rio de Janeiro',    'Rio de Janeiro', true);
+
+-- ------------------------------------------------------------
+-- CUPOM DESCONTO
+-- ------------------------------------------------------------
+INSERT INTO cupomdesconto (id, codigo, descricao, valor_desconto, percentual, data_inicio, data_fim, ativo, datacadastro, dataalteracao) VALUES
+(1, 'BEMVINDO10',   'Desconto de 10% na primeira compra',       10.00, true,  '2025-01-01', '2026-12-31', true,  NOW(), NOW()),
+(2, 'NATAL15',      'Desconto de 15% na Coleção Natal',         15.00, true,  '2025-11-01', '2026-01-15', true,  NOW(), NOW()),
+(3, 'FAMILIA20',    'Desconto de 20% em Pijamas Família',       20.00, true,  '2025-01-01', '2026-12-31', true,  NOW(), NOW()),
+(4, 'FRETEGRATIS',  'Frete grátis em compras acima de R$ 150',  0.00,  false, '2025-01-01', '2026-12-31', true,  NOW(), NOW());
 
 -- ============================================================
--- 2. MUNICÍPIOS (domínio do professor — mantidos)
--- ============================================================
-INSERT INTO municipio (nome, id_estado) VALUES ('Palmas',         1);
-INSERT INTO municipio (nome, id_estado) VALUES ('Gurupi',         1);
-INSERT INTO municipio (nome, id_estado) VALUES ('São Paulo',      2);
-INSERT INTO municipio (nome, id_estado) VALUES ('Rio de Janeiro', 5);
-
--- ============================================================
--- 3. USUÁRIOS
--- admin    senha: admin123
--- cliente1 senha: 123456
--- Perfil: ADM=1 | USER=2
--- ============================================================
-INSERT INTO usuario (nome, username, senha, perfil)
-VALUES ('Administrador', 'admin',
-        'SYu34Plo5KZGE9fMtUK9LRPnWC3WvVpogVg35bf5tPYMM6dxXNV6AWmPEQzOLc110uIwcv8TOigbaCB43f8KHQ==',
-        1);
-
-INSERT INTO usuario (nome, username, senha, perfil)
-VALUES ('Maria Silva', 'cliente1',
-        '0cctg7WgpEz7kC/AzVC+KX+bZLPXDtgJDqWWZWnmzHH+7Na2YVxYYSFPxcf7ImAjqfNckx0aT4n5qKM7WEoeEQ==',
-        2);
-
--- ============================================================
--- 4. CATEGORIAS
--- ============================================================
-INSERT INTO categoria (nome, descricao) VALUES ('Pijama Infantil Menina', 'Pijamas femininos de 0 a 12 anos');
-INSERT INTO categoria (nome, descricao) VALUES ('Pijama Infantil Menino', 'Pijamas masculinos de 0 a 12 anos');
-INSERT INTO categoria (nome, descricao) VALUES ('Pijama Unissex',         'Pijamas unissex para todas as idades');
-INSERT INTO categoria (nome, descricao) VALUES ('Pijama Adulto',          'Pijamas adultos femininos e masculinos');
-
--- ============================================================
--- 5. MARCAS
--- ============================================================
-INSERT INTO marca (nome, descricao) VALUES ('Julie',        'Linha feminina exclusiva da Julie e Bela');
-INSERT INTO marca (nome, descricao) VALUES ('Bela',         'Linha masculina exclusiva da Julie e Bela');
-INSERT INTO marca (nome, descricao) VALUES ('Julie e Bela', 'Linha unissex da Julie e Bela');
-
--- ============================================================
--- 6. ESTAMPAS
--- ============================================================
-INSERT INTO estampa (nome) VALUES ('Unicórnios');
-INSERT INTO estampa (nome) VALUES ('Dinossauros');
-INSERT INTO estampa (nome) VALUES ('Estrelas');
-INSERT INTO estampa (nome) VALUES ('Liso');
-
--- ============================================================
--- 7. CORES
--- ============================================================
-INSERT INTO cor (nome, hexadecimal) VALUES ('Rosa',    '#FF69B4');
-INSERT INTO cor (nome, hexadecimal) VALUES ('Azul',    '#4169E1');
-INSERT INTO cor (nome, hexadecimal) VALUES ('Amarelo', '#FFD700');
-INSERT INTO cor (nome, hexadecimal) VALUES ('Branco',  '#FFFFFF');
-INSERT INTO cor (nome, hexadecimal) VALUES ('Roxo',    '#800080');
-
--- ============================================================
--- 8. MATERIAIS
--- ============================================================
-INSERT INTO material (nome, descricao) VALUES ('Algodão', '100% algodão hipoalergênico — macio e respirável');
-INSERT INTO material (nome, descricao) VALUES ('Malha',   'Malha de algodão com elastano — confortável e flexível');
-INSERT INTO material (nome, descricao) VALUES ('Fleece',  'Tecido quentinho, ideal para noites frias');
-
--- ============================================================
--- 9. PIJAMAS
--- Sexo: FEMININO=1 | MASCULINO=2 | UNISSEX=3
--- ============================================================
-INSERT INTO pijama (nome, descricao, preco, modelo, ativo, sexo, categoria_id, marca_id, estampa_id)
-VALUES ('Pijama Unicórnio Rosa',
-        'Pijama manga longa com estampa de unicórnios mágicos, em algodão premium',
-        79.90, 'Manga Longa', true, 1, 1, 1, 1);
-
-INSERT INTO pijama (nome, descricao, preco, modelo, ativo, sexo, categoria_id, marca_id, estampa_id)
-VALUES ('Pijama Estrelas Lilás',
-        'Pijama manga curta com estrelinhas brilhantes, perfeito para o verão',
-        89.90, 'Manga Curta', true, 1, 1, 1, 3);
-
-INSERT INTO pijama (nome, descricao, preco, modelo, ativo, sexo, categoria_id, marca_id, estampa_id)
-VALUES ('Pijama Dinossauro',
-        'Pijama manga longa temático de dinossauros, ideal para os pequenos aventureiros',
-        79.90, 'Manga Longa', true, 2, 2, 2, 2);
-
-INSERT INTO pijama (nome, descricao, preco, modelo, ativo, sexo, categoria_id, marca_id, estampa_id)
-VALUES ('Pijama Liso Azul',
-        'Pijama masculino liso em malha premium, clássico e confortável',
-        69.90, 'Manga Curta', true, 2, 2, 2, 4);
-
-INSERT INTO pijama (nome, descricao, preco, modelo, ativo, sexo, categoria_id, marca_id, estampa_id)
-VALUES ('Pijama Unissex Estrelas',
-        'Pijama unissex com estampa de estrelas, perfeito para presentear',
-        84.90, 'Manga Longa', true, 3, 3, 3, 3);
-
-INSERT INTO pijama (nome, descricao, preco, modelo, ativo, sexo, categoria_id, marca_id, estampa_id)
-VALUES ('Pijama Fleece Lilás',
-        'Pijama quentinho de fleece para noites frias, disponível em lilás e rosa',
-        94.90, 'Manga Longa', true, 1, 1, 1, 4);
-
-INSERT INTO pijama (nome, descricao, preco, modelo, ativo, sexo, categoria_id, marca_id, estampa_id)
-VALUES ('Pijama Body Recém-Nascido',
-        'Body macio em algodão premium para recém-nascidos, com estampa de unicórnios',
-        59.90, 'Body', true, 3, 3, 3, 1);
-
--- ============================================================
--- 10. PIJAMA × MATERIAL
--- ============================================================
-INSERT INTO pijama_material (pijama_id, material_id) VALUES (1, 1); -- Unicórnio Rosa   → Algodão
-INSERT INTO pijama_material (pijama_id, material_id) VALUES (1, 2); -- Unicórnio Rosa   → Malha
-INSERT INTO pijama_material (pijama_id, material_id) VALUES (2, 1); -- Estrelas Lilás   → Algodão
-INSERT INTO pijama_material (pijama_id, material_id) VALUES (3, 1); -- Dinossauro       → Algodão
-INSERT INTO pijama_material (pijama_id, material_id) VALUES (3, 2); -- Dinossauro       → Malha
-INSERT INTO pijama_material (pijama_id, material_id) VALUES (4, 2); -- Liso Azul        → Malha
-INSERT INTO pijama_material (pijama_id, material_id) VALUES (4, 3); -- Liso Azul        → Fleece
-INSERT INTO pijama_material (pijama_id, material_id) VALUES (5, 1); -- Unissex Estrelas → Algodão
-INSERT INTO pijama_material (pijama_id, material_id) VALUES (5, 2); -- Unissex Estrelas → Malha
-INSERT INTO pijama_material (pijama_id, material_id) VALUES (6, 3); -- Fleece Lilás     → Fleece
-INSERT INTO pijama_material (pijama_id, material_id) VALUES (7, 1); -- Body RN          → Algodão
-
--- ============================================================
--- 11. PIJAMA × VARIANTE
--- Pijamas 1, 2, 3, 6: COM cor | Pijamas 4, 5, 7: SEM cor
--- ============================================================
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (1, 'QUATRO_ANOS', 1, 10);
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (1, 'SEIS_ANOS',   1,  8);
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (1, 'QUATRO_ANOS', 5,  5);
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (1, 'SEIS_ANOS',   5,  3);
-
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (2, 'SEIS_ANOS',   1, 12);
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (2, 'OITO_ANOS',   1,  8);
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (2, 'SEIS_ANOS',   3,  6);
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (2, 'OITO_ANOS',   3,  4);
-
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (3, 'QUATRO_ANOS', 2, 10);
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (3, 'SEIS_ANOS',   2,  8);
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (3, 'OITO_ANOS',   2,  6);
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (3, 'QUATRO_ANOS', 4,  5);
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (3, 'SEIS_ANOS',   4,  3);
-
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (4, 'SEIS_ANOS',   null, 15);
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (4, 'OITO_ANOS',   null, 12);
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (4, 'DEZ_ANOS',    null,  8);
-
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (5, 'DOIS_ANOS',   null, 10);
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (5, 'QUATRO_ANOS', null,  6);
-
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (6, 'SEIS_ANOS',   1,  8);
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (6, 'OITO_ANOS',   1,  6);
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (6, 'SEIS_ANOS',   5,  5);
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (6, 'OITO_ANOS',   5,  4);
-
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (7, 'RN',                null, 15);
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (7, 'P',   null, 12);
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (7, 'M', null,  8);
-
--- ============================================================
--- 12. CLIENTE  (vinculado ao usuario id=2 / cliente1)
--- ============================================================
-INSERT INTO cliente (nome, cpf, email, data_nascimento, usuario_id)
-VALUES ('Maria Silva', '12345678901', 'maria@email.com', '1995-06-15', 2);
-
--- ============================================================
--- 13. TELEFONE DO CLIENTE
--- ============================================================
-INSERT INTO cliente_telefone (cliente_id, codigo_area, numero)
-VALUES (1, '63', '999990001');
-
--- ============================================================
--- 14. ENDEREÇO DO CLIENTE
--- ============================================================
-INSERT INTO cliente_endereco (cliente_id, logradouro, numero, complemento, bairro, cep, municipio, estado, principal)
-VALUES (1, 'Quadra 203 Sul', '12', 'Apto 301', 'Plano Diretor Sul', '77020-016', 'Palmas', 'Tocantins', true);
-
--- ============================================================
--- 15. CUPONS DE DESCONTO
--- percentual=true  → valor_desconto é % (ex: 10.0 = 10%)
--- percentual=false → valor_desconto é R$ fixo
--- ============================================================
-INSERT INTO CupomDesconto (codigo, descricao, valor_desconto, percentual, data_inicio, data_fim, ativo)
-VALUES ('JULIE10', '10% de desconto em qualquer pijama Julie e Bela',
-        10.0, true, '2026-01-01', '2026-12-31', true);
-
-INSERT INTO CupomDesconto (codigo, descricao, valor_desconto, percentual, data_inicio, data_fim, ativo)
-VALUES ('FRETE20', 'R$ 20,00 de desconto — válido em compras acima de R$ 150,00',
-        20.0, false, '2026-01-01', '2026-12-31', true);
-
--- ============================================================
--- 16. PIJAMAS ADICIONAIS (IDs 8–27)
--- Cobrem: todas as categorias × todos os modelos × materiais ×
---         tamanhos variados × cores × preços × ativo/inativo
--- Sexo: FEMININO=1 | MASCULINO=2 | UNISSEX=3
+-- PIJAMAS
+-- sexo: 1=Feminino 2=Masculino 3=Unissex
+-- estampa_id nullable (1 produto sem estampa)
+-- 1 produto inativo
+-- modelo mantido como NULL (campo existe mas não usamos)
 -- ============================================================
 
--- ── MENINA (categoria_id=1, marca_id=1 Julie) ──────────────
+-- ---- BODY BEBÊ (cat 1) — 4 produtos ----
+INSERT INTO pijama (id, nome, descricao, preco, modelo, ativo, sexo, categoria_id, marca_id, estampa_id, datacadastro, dataalteracao) VALUES
+(1,  'Body Bebê Unicórnio Rosa',      'Body manga curta em suedine com estampa de unicórnio',     49.90, NULL, true,  1, 1, 1, 1,    NOW(), NOW()),
+(2,  'Body Bebê Dinossauro Azul',     'Body manga longa em algodão com estampa de dinossauro',    44.90, NULL, true,  2, 1, 1, 2,    NOW(), NOW()),
+(3,  'Body Bebê Ursinho Bege',        'Body sem manga em suedine tom neutro com ursinho',         39.90, NULL, true,  3, 1, 1, 3,    NOW(), NOW()),
+(4,  'Body Bebê Liso Branco',         'Body básico liso branco 100% algodão — sem estampa',       42.90, NULL, true,  3, 1, 1, NULL, NOW(), NOW());  -- sem estampa
 
--- 8 Body para bebê menina
-INSERT INTO pijama (nome, descricao, preco, modelo, ativo, sexo, categoria_id, marca_id, estampa_id)
-VALUES ('Body Liso Rosa', 'Body em algodão premium para bebê menina, macio e hipoalergênico',
-        49.90, 'Body', true, 1, 1, 1, 4);
+-- ---- MACACÃO (cat 2) — 6 produtos ----
+INSERT INTO pijama (id, nome, descricao, preco, modelo, ativo, sexo, categoria_id, marca_id, estampa_id, datacadastro, dataalteracao) VALUES
+(5,  'Macacão Astronauta Cinza',      'Macacão manga longa em cotton estampa astronauta',         69.90, NULL, true,  2, 2, 1, 4,    NOW(), NOW()),
+(6,  'Macacão Arco-íris Lilás',       'Macacão em suedine com estampa arco-íris colorida',        64.90, NULL, true,  1, 2, 1, 5,    NOW(), NOW()),
+(7,  'Macacão Flores Rosa',           'Macacão delicado em algodão com florais bordados',          59.90, NULL, true,  1, 2, 1, 6,    NOW(), NOW()),
+(8,  'Macacão Xadrez Vermelho',       'Macacão xadrez quentinho em flanela',                       74.90, NULL, true,  3, 2, 1, 9,    NOW(), NOW()),
+(9,  'Macacão Ursinho Verde',         'Macacão em microfibra com ursinho bordado no peito',        79.90, NULL, true,  2, 2, 1, 3,    NOW(), NOW()),
+(10, 'Macacão Liso Azul Marinho',     'Macacão liso azul marinho em algodão premium',             49.90, NULL, false, 2, 2, 1, NULL, NOW(), NOW());  -- inativo + sem estampa
 
--- 9 Macacão Unicórnio menina
-INSERT INTO pijama (nome, descricao, preco, modelo, ativo, sexo, categoria_id, marca_id, estampa_id)
-VALUES ('Macacão Unicórnio', 'Macacão manga longa com estampa de unicórnio — quentinho e fofo',
-        99.90, 'Macacão', true, 1, 1, 1, 1);
+-- ---- PIJAMA INFANTIL (cat 3) — 10 produtos ----
+INSERT INTO pijama (id, nome, descricao, preco, modelo, ativo, sexo, categoria_id, marca_id, estampa_id, datacadastro, dataalteracao) VALUES
+(11, 'Pijama Infantil Unicórnio',     'Conjunto calça e blusa em cotton com unicórnio',            79.90, NULL, true,  1, 3, 1, 1,    NOW(), NOW()),
+(12, 'Pijama Infantil Dinossauro',    'Conjunto manga longa dinossauro em algodão',                74.90, NULL, true,  2, 3, 1, 2,    NOW(), NOW()),
+(13, 'Pijama Infantil Estrelas',      'Conjunto calça e blusa estampa estrelas cintilantes',       69.90, NULL, true,  3, 3, 1, 8,    NOW(), NOW()),
+(14, 'Pijama Infantil Astronauta',    'Conjunto infantil temático espaço em microfibra',           84.90, NULL, true,  2, 3, 1, 4,    NOW(), NOW()),
+(15, 'Pijama Infantil Arco-íris',     'Conjunto colorido arco-íris em cotton penteado',            79.90, NULL, true,  1, 3, 1, 5,    NOW(), NOW()),
+(16, 'Pijama Infantil Corações',      'Conjunto rosa com corações em suedine macio',               74.90, NULL, true,  1, 3, 1, 7,    NOW(), NOW()),
+(17, 'Pijama Infantil Ursinho',       'Conjunto clássico ursinho em algodão premium',              69.90, NULL, true,  3, 3, 1, 3,    NOW(), NOW()),
+(18, 'Pijama Infantil Flores',        'Conjunto florido em cotton suave para meninas',             79.90, NULL, true,  1, 3, 1, 6,    NOW(), NOW()),
+(19, 'Pijama Infantil Xadrez Azul',   'Conjunto xadrez azul em flanela quentinha',                84.90, NULL, true,  2, 3, 1, 9,    NOW(), NOW()),
+(20, 'Pijama Infantil Liso Cinza',    'Conjunto liso cinza básico em algodão',                     59.90, NULL, true,  3, 3, 1, 11,   NOW(), NOW());
 
--- 10 Manga Curta Estrelas menina
-INSERT INTO pijama (nome, descricao, preco, modelo, ativo, sexo, categoria_id, marca_id, estampa_id)
-VALUES ('Pijama Estrelas Pink', 'Manga curta com estampas de estrelas brilhantes em tons de rosa',
-        69.90, 'Manga Curta', true, 1, 1, 1, 3);
+-- ---- PIJAMA JUVENIL (cat 4) — 5 produtos ----
+INSERT INTO pijama (id, nome, descricao, preco, modelo, ativo, sexo, categoria_id, marca_id, estampa_id, datacadastro, dataalteracao) VALUES
+(21, 'Pijama Juvenil Estrelas',       'Conjunto juvenil estrelas em microfibra suave',             89.90, NULL, true,  3, 4, 1, 8,    NOW(), NOW()),
+(22, 'Pijama Juvenil Astronauta',     'Conjunto temático espaço para jovens em cotton',           99.90, NULL, true,  2, 4, 1, 4,    NOW(), NOW()),
+(23, 'Pijama Juvenil Flores',         'Conjunto floral juvenil em algodão penteado',               94.90, NULL, true,  1, 4, 1, 6,    NOW(), NOW()),
+(24, 'Pijama Juvenil Xadrez',         'Conjunto xadrez clássico em flanela para jovens',         109.90, NULL, true,  3, 4, 1, 9,    NOW(), NOW()),
+(25, 'Pijama Juvenil Liso Azul',      'Conjunto liso azul marinho em cotton premium',             119.90, NULL, true,  2, 4, 1, 11,   NOW(), NOW());
 
--- 11 Manga Longa Fleece menina
-INSERT INTO pijama (nome, descricao, preco, modelo, ativo, sexo, categoria_id, marca_id, estampa_id)
-VALUES ('Pijama Fleece Roxo Menina', 'Manga longa em fleece quentinho para noites frias, cor lilás',
-        109.90, 'Manga Longa', true, 1, 1, 1, 4);
+-- ---- PIJAMA ADULTO (cat 5) — 5 produtos ----
+INSERT INTO pijama (id, nome, descricao, preco, modelo, ativo, sexo, categoria_id, marca_id, estampa_id, datacadastro, dataalteracao) VALUES
+(26, 'Pijama Adulto Flores',          'Conjunto adulto floral em algodão premium',                109.90, NULL, true,  1, 5, 1, 6,    NOW(), NOW()),
+(27, 'Pijama Adulto Estrelas',        'Conjunto adulto estrelas em microfibra premium',           119.90, NULL, true,  3, 5, 1, 8,    NOW(), NOW()),
+(28, 'Pijama Adulto Xadrez Flanela',  'Conjunto adulto xadrez em flanela quente',                129.90, NULL, true,  3, 5, 1, 9,    NOW(), NOW()),
+(29, 'Pijama Adulto Liso Rosa',       'Conjunto adulto liso rosa em cotton penteado',             99.90, NULL, true,  1, 5, 1, 11,   NOW(), NOW()),
+(30, 'Pijama Adulto Liso Cinza',      'Conjunto adulto liso cinza em algodão premium',           139.90, NULL, true,  2, 5, 1, 11,   NOW(), NOW());
 
--- ── MENINO (categoria_id=2, marca_id=2 Bela) ───────────────
+-- ---- PIJAMA FAMÍLIA (cat 6) — 3 produtos ----
+INSERT INTO pijama (id, nome, descricao, preco, modelo, ativo, sexo, categoria_id, marca_id, estampa_id, datacadastro, dataalteracao) VALUES
+(31, 'Pijama Família Ursinho',        'Kit família combinando ursinho em algodão macio',          149.90, NULL, true,  3, 6, 1, 3,    NOW(), NOW()),
+(32, 'Pijama Família Estrelas',       'Kit família estrelas em microfibra ultramacia',            159.90, NULL, true,  3, 6, 1, 8,    NOW(), NOW()),
+(33, 'Pijama Família Xadrez',         'Kit família xadrez clássico em flanela quentinha',        149.90, NULL, true,  3, 6, 1, 9,    NOW(), NOW());
 
--- 12 Body para bebê menino
-INSERT INTO pijama (nome, descricao, preco, modelo, ativo, sexo, categoria_id, marca_id, estampa_id)
-VALUES ('Body Liso Azul', 'Body em algodão para bebê menino, toque suave e hipoalergênico',
-        49.90, 'Body', true, 2, 2, 2, 4);
-
--- 13 Macacão Dinossauro menino
-INSERT INTO pijama (nome, descricao, preco, modelo, ativo, sexo, categoria_id, marca_id, estampa_id)
-VALUES ('Macacão Dino Aventura', 'Macacão divertido com estampas de dinossauros — aventura garantida',
-        89.90, 'Macacão', true, 2, 2, 2, 2);
-
--- 14 Manga Longa Liso menino
-INSERT INTO pijama (nome, descricao, preco, modelo, ativo, sexo, categoria_id, marca_id, estampa_id)
-VALUES ('Pijama Clássico Azul', 'Manga longa liso em malha premium — confortável e durável',
-        74.90, 'Manga Longa', true, 2, 2, 2, 4);
-
--- 15 Manga Curta Liso menino
-INSERT INTO pijama (nome, descricao, preco, modelo, ativo, sexo, categoria_id, marca_id, estampa_id)
-VALUES ('Pijama Verão Menino', 'Manga curta leve em malha de algodão — ideal para o verão',
-        64.90, 'Manga Curta', true, 2, 2, 2, 4);
-
--- 16 Manga Longa Fleece menino
-INSERT INTO pijama (nome, descricao, preco, modelo, ativo, sexo, categoria_id, marca_id, estampa_id)
-VALUES ('Pijama Fleece Azul Menino', 'Manga longa em fleece, perfeito para noites de inverno',
-        104.90, 'Manga Longa', true, 2, 2, 2, 4);
-
--- ── UNISSEX (categoria_id=3, marca_id=3 Julie e Bela) ──────
-
--- 17 Body unissex bebê
-INSERT INTO pijama (nome, descricao, preco, modelo, ativo, sexo, categoria_id, marca_id, estampa_id)
-VALUES ('Body Unissex Branco', 'Body liso branco para recém-nascido, em algodão 100% orgânico',
-        44.90, 'Body', true, 3, 3, 3, 4);
-
--- 18 Macacão unissex Estrelas
-INSERT INTO pijama (nome, descricao, preco, modelo, ativo, sexo, categoria_id, marca_id, estampa_id)
-VALUES ('Macacão Estrelado', 'Macacão com estampas de estrelas, confortável para noites de frio',
-        94.90, 'Macacão', true, 3, 3, 3, 3);
-
--- 19 Manga Curta unissex
-INSERT INTO pijama (nome, descricao, preco, modelo, ativo, sexo, categoria_id, marca_id, estampa_id)
-VALUES ('Pijama Unissex Verão', 'Manga curta leve e fresca, perfeito para o calor do verão',
-        69.90, 'Manga Curta', true, 3, 3, 3, 4);
-
--- 20 Manga Longa Fleece unissex
-INSERT INTO pijama (nome, descricao, preco, modelo, ativo, sexo, categoria_id, marca_id, estampa_id)
-VALUES ('Pijama Fleece Unissex', 'Manga longa em fleece quentinho — ideal para o inverno',
-        129.90, 'Manga Longa', true, 3, 3, 3, 4);
-
--- ── ADULTO (categoria_id=4) ─────────────────────────────────
-
--- 21 Manga Longa Adulto feminino
-INSERT INTO pijama (nome, descricao, preco, modelo, ativo, sexo, categoria_id, marca_id, estampa_id)
-VALUES ('Pijama Adulto Estrelas', 'Manga longa feminina com estampas delicadas de estrelas — algodão premium',
-        119.90, 'Manga Longa', true, 1, 4, 1, 3);
-
--- 22 Manga Curta Adulto unissex
-INSERT INTO pijama (nome, descricao, preco, modelo, ativo, sexo, categoria_id, marca_id, estampa_id)
-VALUES ('Pijama Adulto Liso Verão', 'Manga curta em malha — confortável e leve para noites quentes',
-        89.90, 'Manga Curta', true, 3, 4, 3, 4);
-
--- 23 Manga Longa Fleece Adulto masculino
-INSERT INTO pijama (nome, descricao, preco, modelo, ativo, sexo, categoria_id, marca_id, estampa_id)
-VALUES ('Pijama Adulto Fleece Inverno', 'Manga longa em fleece premium — máximo conforto no inverno',
-        139.90, 'Manga Longa', true, 2, 4, 2, 4);
-
--- 24 Macacão Adulto feminino
-INSERT INTO pijama (nome, descricao, preco, modelo, ativo, sexo, categoria_id, marca_id, estampa_id)
-VALUES ('Macacão Adulto Rosa', 'Macacão adulto em malha macia — conforto e estilo em uma só peça',
-        149.90, 'Macacão', true, 1, 4, 1, 4);
-
--- ── INATIVOS (mix de categorias/modelos) ───────────────────
-
--- 25 Manga Longa inativo menina
-INSERT INTO pijama (nome, descricao, preco, modelo, ativo, sexo, categoria_id, marca_id, estampa_id)
-VALUES ('Pijama Estrelas Amarelas', 'Manga longa com estampas de estrelas em amarelo vibrante',
-        84.90, 'Manga Longa', false, 1, 1, 1, 3);
-
--- 26 Manga Curta inativo menino
-INSERT INTO pijama (nome, descricao, preco, modelo, ativo, sexo, categoria_id, marca_id, estampa_id)
-VALUES ('Pijama Dino Amarelo', 'Manga curta com dinossauros divertidos — edição limitada',
-        74.90, 'Manga Curta', false, 2, 2, 2, 2);
-
--- 27 Macacão inativo unissex
-INSERT INTO pijama (nome, descricao, preco, modelo, ativo, sexo, categoria_id, marca_id, estampa_id)
-VALUES ('Macacão Liso Unissex', 'Macacão liso em algodão e malha — conforto total para os pequenos',
-        79.90, 'Macacão', false, 3, 3, 3, 4);
+-- ---- COLEÇÃO NATAL (cat 7) — 3 produtos ----
+INSERT INTO pijama (id, nome, descricao, preco, modelo, ativo, sexo, categoria_id, marca_id, estampa_id, datacadastro, dataalteracao) VALUES
+(34, 'Natal Bebê Papai Noel',         'Body natalino especial para bebê em suedine',               59.90, NULL, true,  3, 7, 1, 10,   NOW(), NOW()),
+(35, 'Natal Infantil Renas',          'Pijama natalino infantil com renas em cotton',              89.90, NULL, true,  3, 7, 1, 10,   NOW(), NOW()),
+(36, 'Natal Família Xadrez Vermelho', 'Kit família natal xadrez vermelho em flanela',             149.90, NULL, true,  3, 7, 1, 10,   NOW(), NOW());
 
 -- ============================================================
--- 17. PIJAMA × MATERIAL (pijamas 8–27)
+-- PIJAMA → MATERIAL (join table)
 -- ============================================================
-INSERT INTO pijama_material (pijama_id, material_id) VALUES (8,  1); -- Body Rosa         → Algodão
-INSERT INTO pijama_material (pijama_id, material_id) VALUES (9,  1); -- Macacão Unicórnio → Algodão
-INSERT INTO pijama_material (pijama_id, material_id) VALUES (9,  2); -- Macacão Unicórnio → Malha
-INSERT INTO pijama_material (pijama_id, material_id) VALUES (10, 1); -- Estrelas Pink      → Algodão
-INSERT INTO pijama_material (pijama_id, material_id) VALUES (11, 3); -- Fleece Roxo       → Fleece
-INSERT INTO pijama_material (pijama_id, material_id) VALUES (12, 1); -- Body Azul         → Algodão
-INSERT INTO pijama_material (pijama_id, material_id) VALUES (13, 1); -- Macacão Dino      → Algodão
-INSERT INTO pijama_material (pijama_id, material_id) VALUES (13, 2); -- Macacão Dino      → Malha
-INSERT INTO pijama_material (pijama_id, material_id) VALUES (14, 2); -- Clássico Azul     → Malha
-INSERT INTO pijama_material (pijama_id, material_id) VALUES (15, 2); -- Verão Menino      → Malha
-INSERT INTO pijama_material (pijama_id, material_id) VALUES (16, 3); -- Fleece Azul       → Fleece
-INSERT INTO pijama_material (pijama_id, material_id) VALUES (17, 1); -- Body Unissex      → Algodão
-INSERT INTO pijama_material (pijama_id, material_id) VALUES (18, 1); -- Macacão Estrelado → Algodão
-INSERT INTO pijama_material (pijama_id, material_id) VALUES (18, 2); -- Macacão Estrelado → Malha
-INSERT INTO pijama_material (pijama_id, material_id) VALUES (19, 1); -- Unissex Verão     → Algodão
-INSERT INTO pijama_material (pijama_id, material_id) VALUES (20, 3); -- Fleece Unissex    → Fleece
-INSERT INTO pijama_material (pijama_id, material_id) VALUES (21, 1); -- Adulto Estrelas   → Algodão
-INSERT INTO pijama_material (pijama_id, material_id) VALUES (21, 2); -- Adulto Estrelas   → Malha
-INSERT INTO pijama_material (pijama_id, material_id) VALUES (22, 2); -- Adulto Liso Verão → Malha
-INSERT INTO pijama_material (pijama_id, material_id) VALUES (23, 3); -- Adulto Fleece     → Fleece
-INSERT INTO pijama_material (pijama_id, material_id) VALUES (24, 2); -- Macacão Adulto    → Malha
-INSERT INTO pijama_material (pijama_id, material_id) VALUES (25, 1); -- Estrelas Amarelas → Algodão
-INSERT INTO pijama_material (pijama_id, material_id) VALUES (26, 2); -- Dino Amarelo      → Malha
-INSERT INTO pijama_material (pijama_id, material_id) VALUES (27, 1); -- Macacão Liso      → Algodão
-INSERT INTO pijama_material (pijama_id, material_id) VALUES (27, 2); -- Macacão Liso      → Malha
+INSERT INTO pijama_material (pijama_id, material_id) VALUES
+-- Body Bebê
+(1, 2),(2, 1),(3, 2),(4, 1),
+-- Macacão
+(5, 3),(6, 2),(7, 1),(8, 4),(9, 5),(10, 1),
+-- Infantil
+(11, 3),(12, 1),(13, 3),(14, 5),(15, 3),(16, 2),(17, 1),(18, 3),(19, 4),(20, 1),
+-- Juvenil
+(21, 5),(22, 3),(23, 1),(24, 4),(25, 3),
+-- Adulto
+(26, 1),(27, 5),(28, 4),(29, 3),(30, 1),
+-- Família
+(31, 1),(32, 5),(33, 4),
+-- Natal
+(34, 2),(35, 3),(36, 4);
 
 -- ============================================================
--- 18. PIJAMA × VARIANTE (pijamas 8–27)
--- Tamanhos: RN | UM_A_TRES_MESES | TRES_A_SEIS_MESES | SEIS_A_NOVE_MESES
---           UM_ANO | DOIS_ANOS | TRES_ANOS | QUATRO_ANOS | SEIS_ANOS
---           OITO_ANOS | DEZ_ANOS | DOZE_ANOS | ADULTO
+-- PIJAMA VARIANTE
+-- Tabela: pijamavariante (sem underscore — naming strategy Hibernate 6)
+-- tamanho: VARCHAR com nome do enum Java
+-- cor_id nullable (1 produto sem cor = id 10, produto "sem cor" = produto 4)
+-- ~150 variantes distribuídas
+-- estoque: 70% 5-20 | 20% 1-3 | 10% 0
 -- ============================================================
 
--- Pijama 8 — Body Liso Rosa (bebê, tamanhos RN–SEIS_A_NOVE_MESES, cor Rosa=1)
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (8, 'RN',                1, 20);
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (8, 'P',   1, 15);
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (8, 'M', 1, 12);
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (8, 'G', 1,  8);
+-- ---- Body Bebê (tamanhos: RN, P, M) ----
 
--- Pijama 9 — Macacão Unicórnio (4–8 anos, Rosa=1 e Roxo=5)
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (9, 'QUATRO_ANOS', 1, 10);
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (9, 'SEIS_ANOS',   1,  8);
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (9, 'OITO_ANOS',   1,  6);
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (9, 'QUATRO_ANOS', 5,  8);
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (9, 'SEIS_ANOS',   5,  6);
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (9, 'OITO_ANOS',   5,  4);
+-- Produto 1: Body Bebê Unicórnio Rosa — 3 variantes
+INSERT INTO pijamavariante (pijama_id, tamanho, cor_id, estoque, datacadastro, dataalteracao) VALUES
+(1, 'RN', 1,  12, NOW(), NOW()),
+(1, 'P',  1,  8,  NOW(), NOW()),
+(1, 'M',  1,  0,  NOW(), NOW());  -- estoque 0
 
--- Pijama 10 — Estrelas Pink (6–12 anos, Rosa=1)
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (10, 'SEIS_ANOS',   1, 12);
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (10, 'OITO_ANOS',   1, 10);
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (10, 'DEZ_ANOS',    1,  8);
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (10, 'DOZE_ANOS',   1,  5);
+-- Produto 2: Body Bebê Dinossauro Azul — 3 variantes
+INSERT INTO pijamavariante (pijama_id, tamanho, cor_id, estoque, datacadastro, dataalteracao) VALUES
+(2, 'RN', 3,  15, NOW(), NOW()),
+(2, 'P',  3,  10, NOW(), NOW()),
+(2, 'M',  3,  2,  NOW(), NOW());  -- estoque baixo
 
--- Pijama 11 — Fleece Roxo Menina (6–10 anos, Roxo=5)
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (11, 'SEIS_ANOS',  5,  8);
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (11, 'OITO_ANOS',  5,  6);
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (11, 'DEZ_ANOS',   5,  4);
+-- Produto 3: Body Bebê Ursinho Bege — 3 variantes
+INSERT INTO pijamavariante (pijama_id, tamanho, cor_id, estoque, datacadastro, dataalteracao) VALUES
+(3, 'RN', 7,  18, NOW(), NOW()),
+(3, 'P',  7,  14, NOW(), NOW()),
+(3, 'M',  7,  6,  NOW(), NOW());
 
--- Pijama 12 — Body Liso Azul (bebê, Azul=2)
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (12, 'RN',                2, 20);
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (12, 'P',   2, 15);
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (12, 'M', 2, 12);
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (12, 'G', 2,  8);
+-- Produto 4: Body Bebê Liso Branco — 1 variante (produto com 1 variante, sem cor)
+INSERT INTO pijamavariante (pijama_id, tamanho, cor_id, estoque, datacadastro, dataalteracao) VALUES
+(4, 'RN', NULL, 20, NOW(), NOW());  -- sem cor, 1 única variante
 
--- Pijama 13 — Macacão Dino Aventura (4–8 anos, Azul=2 e Amarelo=3)
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (13, 'QUATRO_ANOS', 2, 10);
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (13, 'SEIS_ANOS',   2,  8);
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (13, 'OITO_ANOS',   2,  6);
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (13, 'QUATRO_ANOS', 3,  6);
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (13, 'SEIS_ANOS',   3,  4);
+-- ---- Macacão (tamanhos: RN, P, M, G) ----
 
--- Pijama 14 — Clássico Azul (6–12 anos, Azul=2)
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (14, 'SEIS_ANOS',  2, 15);
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (14, 'OITO_ANOS',  2, 12);
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (14, 'DEZ_ANOS',   2,  8);
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (14, 'DOZE_ANOS',  2,  5);
+-- Produto 5: Macacão Astronauta Cinza — 4 variantes
+INSERT INTO pijamavariante (pijama_id, tamanho, cor_id, estoque, datacadastro, dataalteracao) VALUES
+(5, 'RN', 6,  10, NOW(), NOW()),
+(5, 'P',  6,  8,  NOW(), NOW()),
+(5, 'M',  6,  5,  NOW(), NOW()),
+(5, 'G',  6,  1,  NOW(), NOW());  -- estoque baixo
 
--- Pijama 15 — Verão Menino (4–10 anos, sem cor)
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (15, 'QUATRO_ANOS', null, 15);
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (15, 'SEIS_ANOS',   null, 12);
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (15, 'OITO_ANOS',   null, 10);
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (15, 'DEZ_ANOS',    null,  6);
+-- Produto 6: Macacão Arco-íris Lilás — 4 variantes
+INSERT INTO pijamavariante (pijama_id, tamanho, cor_id, estoque, datacadastro, dataalteracao) VALUES
+(6, 'RN', 2,  12, NOW(), NOW()),
+(6, 'P',  2,  9,  NOW(), NOW()),
+(6, 'M',  2,  7,  NOW(), NOW()),
+(6, 'G',  2,  0,  NOW(), NOW());  -- estoque 0
 
--- Pijama 16 — Fleece Azul Menino (6–10 anos, Azul=2)
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (16, 'SEIS_ANOS',  2,  8);
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (16, 'OITO_ANOS',  2,  6);
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (16, 'DEZ_ANOS',   2,  4);
+-- Produto 7: Macacão Flores Rosa — 4 variantes
+INSERT INTO pijamavariante (pijama_id, tamanho, cor_id, estoque, datacadastro, dataalteracao) VALUES
+(7, 'RN', 1,  15, NOW(), NOW()),
+(7, 'P',  1,  11, NOW(), NOW()),
+(7, 'M',  1,  8,  NOW(), NOW()),
+(7, 'G',  1,  3,  NOW(), NOW());
 
--- Pijama 17 — Body Unissex Branco (bebê, sem cor)
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (17, 'RN',                null, 20);
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (17, 'P',   null, 15);
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (17, 'M', null, 12);
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (17, 'G', null,  8);
+-- Produto 8: Macacão Xadrez Vermelho — 4 variantes
+INSERT INTO pijamavariante (pijama_id, tamanho, cor_id, estoque, datacadastro, dataalteracao) VALUES
+(8, 'RN', 8,  6,  NOW(), NOW()),
+(8, 'P',  8,  10, NOW(), NOW()),
+(8, 'M',  8,  14, NOW(), NOW()),
+(8, 'G',  8,  2,  NOW(), NOW());
 
--- Pijama 18 — Macacão Estrelado (2–6 anos, sem cor)
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (18, 'DOIS_ANOS',   null, 10);
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (18, 'QUATRO_ANOS', null,  6);
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (18, 'SEIS_ANOS',   null,  4);
+-- Produto 9: Macacão Ursinho Verde — 4 variantes
+INSERT INTO pijamavariante (pijama_id, tamanho, cor_id, estoque, datacadastro, dataalteracao) VALUES
+(9, 'RN', 9,  7,  NOW(), NOW()),
+(9, 'P',  9,  12, NOW(), NOW()),
+(9, 'M',  9,  5,  NOW(), NOW()),
+(9, 'G',  9,  0,  NOW(), NOW());  -- estoque 0
 
--- Pijama 19 — Unissex Verão (6–12 anos, Branco=4)
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (19, 'SEIS_ANOS',  4, 12);
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (19, 'OITO_ANOS',  4, 10);
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (19, 'DEZ_ANOS',   4,  8);
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (19, 'DOZE_ANOS',  4,  5);
+-- Produto 10: Macacão Azul Marinho (INATIVO) — 4 variantes
+INSERT INTO pijamavariante (pijama_id, tamanho, cor_id, estoque, datacadastro, dataalteracao) VALUES
+(10, 'RN', 4,  5,  NOW(), NOW()),
+(10, 'P',  4,  3,  NOW(), NOW()),
+(10, 'M',  4,  2,  NOW(), NOW()),
+(10, 'G',  4,  1,  NOW(), NOW());
 
--- Pijama 20 — Fleece Unissex (8–12 anos, sem cor)
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (20, 'OITO_ANOS',  null, 10);
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (20, 'DEZ_ANOS',   null,  8);
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (20, 'DOZE_ANOS',  null,  6);
+-- ---- Pijama Infantil (tamanhos: UM_ANO, DOIS_ANOS, QUATRO_ANOS, SEIS_ANOS, OITO_ANOS, DEZ_ANOS) ----
 
--- Pijama 21 — Adulto Estrelas (tamanho ADULTO, Rosa=1 Roxo=5 Branco=4)
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (21, 'ADULTO', 1, 10);
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (21, 'ADULTO', 5,  8);
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (21, 'ADULTO', 4,  6);
+-- Produto 11: Unicórnio — 6 variantes
+INSERT INTO pijamavariante (pijama_id, tamanho, cor_id, estoque, datacadastro, dataalteracao) VALUES
+(11, 'UM_ANO',      1, 10, NOW(), NOW()),
+(11, 'DOIS_ANOS',   1, 8,  NOW(), NOW()),
+(11, 'QUATRO_ANOS', 1, 12, NOW(), NOW()),
+(11, 'SEIS_ANOS',   1, 7,  NOW(), NOW()),
+(11, 'OITO_ANOS',   1, 5,  NOW(), NOW()),
+(11, 'DEZ_ANOS',    1, 0,  NOW(), NOW());  -- estoque 0
 
--- Pijama 22 — Adulto Liso Verão (ADULTO, sem cor)
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (22, 'ADULTO', null, 15);
+-- Produto 12: Dinossauro — 6 variantes
+INSERT INTO pijamavariante (pijama_id, tamanho, cor_id, estoque, datacadastro, dataalteracao) VALUES
+(12, 'UM_ANO',      3, 9,  NOW(), NOW()),
+(12, 'DOIS_ANOS',   3, 14, NOW(), NOW()),
+(12, 'QUATRO_ANOS', 3, 6,  NOW(), NOW()),
+(12, 'SEIS_ANOS',   3, 11, NOW(), NOW()),
+(12, 'OITO_ANOS',   3, 3,  NOW(), NOW()),
+(12, 'DEZ_ANOS',    3, 1,  NOW(), NOW());
 
--- Pijama 23 — Adulto Fleece Inverno (ADULTO, Azul=2 Branco=4)
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (23, 'ADULTO', 2, 10);
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (23, 'ADULTO', 4,  8);
+-- Produto 13: Estrelas — 6 variantes (cores mistas)
+INSERT INTO pijamavariante (pijama_id, tamanho, cor_id, estoque, datacadastro, dataalteracao) VALUES
+(13, 'UM_ANO',      4,  8,  NOW(), NOW()),
+(13, 'DOIS_ANOS',   4,  15, NOW(), NOW()),
+(13, 'QUATRO_ANOS', 4,  10, NOW(), NOW()),
+(13, 'SEIS_ANOS',   10, 6,  NOW(), NOW()),
+(13, 'OITO_ANOS',   10, 2,  NOW(), NOW()),
+(13, 'DEZ_ANOS',    10, 0,  NOW(), NOW());  -- estoque 0
 
--- Pijama 24 — Macacão Adulto Rosa (ADULTO, Rosa=1 Branco=4)
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (24, 'ADULTO', 1,  8);
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (24, 'ADULTO', 4,  5);
+-- Produto 14: Astronauta — 5 variantes
+INSERT INTO pijamavariante (pijama_id, tamanho, cor_id, estoque, datacadastro, dataalteracao) VALUES
+(14, 'DOIS_ANOS',   6,  7,  NOW(), NOW()),
+(14, 'QUATRO_ANOS', 6,  12, NOW(), NOW()),
+(14, 'SEIS_ANOS',   6,  9,  NOW(), NOW()),
+(14, 'OITO_ANOS',   6,  5,  NOW(), NOW()),
+(14, 'DEZ_ANOS',    6,  1,  NOW(), NOW());
 
--- Pijama 25 — Estrelas Amarelas / INATIVO (4–6 anos, Amarelo=3)
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (25, 'QUATRO_ANOS', 3,  5);
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (25, 'SEIS_ANOS',   3,  3);
+-- Produto 15: Arco-íris — 5 variantes
+INSERT INTO pijamavariante (pijama_id, tamanho, cor_id, estoque, datacadastro, dataalteracao) VALUES
+(15, 'UM_ANO',      2, 10, NOW(), NOW()),
+(15, 'DOIS_ANOS',   2, 8,  NOW(), NOW()),
+(15, 'QUATRO_ANOS', 2, 14, NOW(), NOW()),
+(15, 'SEIS_ANOS',   2, 3,  NOW(), NOW()),
+(15, 'DEZ_ANOS',    2, 1,  NOW(), NOW());
 
--- Pijama 26 — Dino Amarelo / INATIVO (6–8 anos, Amarelo=3)
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (26, 'SEIS_ANOS',  3,  4);
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (26, 'OITO_ANOS',  3,  2);
+-- Produto 16: Corações — 5 variantes
+INSERT INTO pijamavariante (pijama_id, tamanho, cor_id, estoque, datacadastro, dataalteracao) VALUES
+(16, 'UM_ANO',      1, 12, NOW(), NOW()),
+(16, 'DOIS_ANOS',   1, 9,  NOW(), NOW()),
+(16, 'QUATRO_ANOS', 1, 7,  NOW(), NOW()),
+(16, 'SEIS_ANOS',   1, 4,  NOW(), NOW()),
+(16, 'OITO_ANOS',   1, 0,  NOW(), NOW());  -- estoque 0
 
--- Pijama 27 — Macacão Liso / INATIVO (4–6 anos, sem cor)
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (27, 'QUATRO_ANOS', null, 3);
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (27, 'SEIS_ANOS',   null, 2);
+-- Produto 17: Ursinho — 4 variantes
+INSERT INTO pijamavariante (pijama_id, tamanho, cor_id, estoque, datacadastro, dataalteracao) VALUES
+(17, 'UM_ANO',      7, 8,  NOW(), NOW()),
+(17, 'DOIS_ANOS',   7, 11, NOW(), NOW()),
+(17, 'QUATRO_ANOS', 7, 6,  NOW(), NOW()),
+(17, 'SEIS_ANOS',   7, 2,  NOW(), NOW());
+
+-- Produto 18: Flores — 4 variantes
+INSERT INTO pijamavariante (pijama_id, tamanho, cor_id, estoque, datacadastro, dataalteracao) VALUES
+(18, 'DOIS_ANOS',   1, 10, NOW(), NOW()),
+(18, 'QUATRO_ANOS', 1, 8,  NOW(), NOW()),
+(18, 'SEIS_ANOS',   1, 5,  NOW(), NOW()),
+(18, 'OITO_ANOS',   1, 1,  NOW(), NOW());
+
+-- Produto 19: Xadrez Azul — 4 variantes
+INSERT INTO pijamavariante (pijama_id, tamanho, cor_id, estoque, datacadastro, dataalteracao) VALUES
+(19, 'QUATRO_ANOS', 3, 9,  NOW(), NOW()),
+(19, 'SEIS_ANOS',   3, 7,  NOW(), NOW()),
+(19, 'OITO_ANOS',   3, 12, NOW(), NOW()),
+(19, 'DEZ_ANOS',    3, 3,  NOW(), NOW());
+
+-- Produto 20: Liso Cinza — 4 variantes
+INSERT INTO pijamavariante (pijama_id, tamanho, cor_id, estoque, datacadastro, dataalteracao) VALUES
+(20, 'UM_ANO',      6, 15, NOW(), NOW()),
+(20, 'DOIS_ANOS',   6, 10, NOW(), NOW()),
+(20, 'QUATRO_ANOS', 6, 7,  NOW(), NOW()),
+(20, 'SEIS_ANOS',   6, 2,  NOW(), NOW());
+
+-- ---- Pijama Juvenil (tamanhos: OITO_ANOS, DEZ_ANOS, DOZE_ANOS, DEZESSEIS_ANOS) ----
+
+-- Produto 21: Estrelas Juvenil — 4 variantes
+INSERT INTO pijamavariante (pijama_id, tamanho, cor_id, estoque, datacadastro, dataalteracao) VALUES
+(21, 'OITO_ANOS',      4, 8,  NOW(), NOW()),
+(21, 'DEZ_ANOS',       4, 10, NOW(), NOW()),
+(21, 'DOZE_ANOS',      4, 6,  NOW(), NOW()),
+(21, 'DEZESSEIS_ANOS', 4, 2,  NOW(), NOW());
+
+-- Produto 22: Astronauta Juvenil — 4 variantes
+INSERT INTO pijamavariante (pijama_id, tamanho, cor_id, estoque, datacadastro, dataalteracao) VALUES
+(22, 'OITO_ANOS',      6,  9,  NOW(), NOW()),
+(22, 'DEZ_ANOS',       6,  12, NOW(), NOW()),
+(22, 'DOZE_ANOS',      6,  7,  NOW(), NOW()),
+(22, 'DEZESSEIS_ANOS', 6,  0,  NOW(), NOW());  -- estoque 0
+
+-- Produto 23: Flores Juvenil — 4 variantes
+INSERT INTO pijamavariante (pijama_id, tamanho, cor_id, estoque, datacadastro, dataalteracao) VALUES
+(23, 'OITO_ANOS',      1, 6,  NOW(), NOW()),
+(23, 'DEZ_ANOS',       1, 9,  NOW(), NOW()),
+(23, 'DOZE_ANOS',      1, 11, NOW(), NOW()),
+(23, 'DEZESSEIS_ANOS', 1, 4,  NOW(), NOW());
+
+-- Produto 24: Xadrez Juvenil — 4 variantes (cores mistas)
+INSERT INTO pijamavariante (pijama_id, tamanho, cor_id, estoque, datacadastro, dataalteracao) VALUES
+(24, 'OITO_ANOS',      8, 10, NOW(), NOW()),
+(24, 'DEZ_ANOS',       8, 8,  NOW(), NOW()),
+(24, 'DOZE_ANOS',      3, 5,  NOW(), NOW()),
+(24, 'DEZESSEIS_ANOS', 3, 1,  NOW(), NOW());
+
+-- Produto 25: Liso Azul Juvenil — 3 variantes
+INSERT INTO pijamavariante (pijama_id, tamanho, cor_id, estoque, datacadastro, dataalteracao) VALUES
+(25, 'DEZ_ANOS',       4, 8,  NOW(), NOW()),
+(25, 'DOZE_ANOS',      4, 5,  NOW(), NOW()),
+(25, 'DEZESSEIS_ANOS', 4, 2,  NOW(), NOW());
+
+-- ---- Pijama Adulto (tamanhos: P, M, G, GG, XG, ADULTO) ----
+
+-- Produto 26: Flores Adulto — 5 variantes
+INSERT INTO pijamavariante (pijama_id, tamanho, cor_id, estoque, datacadastro, dataalteracao) VALUES
+(26, 'P',     1, 7,  NOW(), NOW()),
+(26, 'M',     1, 12, NOW(), NOW()),
+(26, 'G',     1, 9,  NOW(), NOW()),
+(26, 'GG',    1, 5,  NOW(), NOW()),
+(26, 'XG',    1, 2,  NOW(), NOW());
+
+-- Produto 27: Estrelas Adulto — 5 variantes
+INSERT INTO pijamavariante (pijama_id, tamanho, cor_id, estoque, datacadastro, dataalteracao) VALUES
+(27, 'P',     4, 10, NOW(), NOW()),
+(27, 'M',     4, 8,  NOW(), NOW()),
+(27, 'G',     4, 6,  NOW(), NOW()),
+(27, 'GG',    4, 3,  NOW(), NOW()),
+(27, 'XG',    4, 1,  NOW(), NOW());
+
+-- Produto 28: Xadrez Flanela Adulto — 5 variantes
+INSERT INTO pijamavariante (pijama_id, tamanho, cor_id, estoque, datacadastro, dataalteracao) VALUES
+(28, 'P',     8, 9,  NOW(), NOW()),
+(28, 'M',     8, 14, NOW(), NOW()),
+(28, 'G',     8, 11, NOW(), NOW()),
+(28, 'GG',    8, 5,  NOW(), NOW()),
+(28, 'XG',    8, 0,  NOW(), NOW());  -- estoque 0
+
+-- Produto 29: Liso Rosa Adulto — 5 variantes
+INSERT INTO pijamavariante (pijama_id, tamanho, cor_id, estoque, datacadastro, dataalteracao) VALUES
+(29, 'P',     1, 12, NOW(), NOW()),
+(29, 'M',     1, 10, NOW(), NOW()),
+(29, 'G',     1, 8,  NOW(), NOW()),
+(29, 'GG',    1, 3,  NOW(), NOW()),
+(29, 'XG',    1, 1,  NOW(), NOW());
+
+-- Produto 30: Liso Cinza Adulto — 5 variantes
+INSERT INTO pijamavariante (pijama_id, tamanho, cor_id, estoque, datacadastro, dataalteracao) VALUES
+(30, 'P',     6, 7,  NOW(), NOW()),
+(30, 'M',     6, 15, NOW(), NOW()),
+(30, 'G',     6, 9,  NOW(), NOW()),
+(30, 'GG',    6, 4,  NOW(), NOW()),
+(30, 'XG',    6, 1,  NOW(), NOW());
+
+-- ---- Pijama Família (muitas variantes — todos tamanhos cobertos) ----
+
+-- Produto 31: Família Ursinho — 8 variantes (bebê a adulto)
+INSERT INTO pijamavariante (pijama_id, tamanho, cor_id, estoque, datacadastro, dataalteracao) VALUES
+(31, 'RN',         7, 8,  NOW(), NOW()),
+(31, 'P',          7, 10, NOW(), NOW()),
+(31, 'M',          7, 12, NOW(), NOW()),
+(31, 'QUATRO_ANOS',7, 9,  NOW(), NOW()),
+(31, 'SEIS_ANOS',  7, 7,  NOW(), NOW()),
+(31, 'OITO_ANOS',  7, 5,  NOW(), NOW()),
+(31, 'G',          7, 3,  NOW(), NOW()),
+(31, 'GG',         7, 1,  NOW(), NOW());
+
+-- Produto 32: Família Estrelas — 9 variantes
+INSERT INTO pijamavariante (pijama_id, tamanho, cor_id, estoque, datacadastro, dataalteracao) VALUES
+(32, 'RN',           4, 6,  NOW(), NOW()),
+(32, 'P',            4, 10, NOW(), NOW()),
+(32, 'M',            4, 8,  NOW(), NOW()),
+(32, 'DOIS_ANOS',    4, 12, NOW(), NOW()),
+(32, 'QUATRO_ANOS',  4, 9,  NOW(), NOW()),
+(32, 'SEIS_ANOS',    4, 7,  NOW(), NOW()),
+(32, 'OITO_ANOS',    4, 5,  NOW(), NOW()),
+(32, 'G',            4, 2,  NOW(), NOW()),
+(32, 'GG',           4, 0,  NOW(), NOW());  -- estoque 0
+
+-- Produto 33: Família Xadrez — 9 variantes
+INSERT INTO pijamavariante (pijama_id, tamanho, cor_id, estoque, datacadastro, dataalteracao) VALUES
+(33, 'RN',           8, 5,  NOW(), NOW()),
+(33, 'P',            8, 8,  NOW(), NOW()),
+(33, 'M',            8, 10, NOW(), NOW()),
+(33, 'DOIS_ANOS',    8, 12, NOW(), NOW()),
+(33, 'QUATRO_ANOS',  8, 9,  NOW(), NOW()),
+(33, 'SEIS_ANOS',    8, 7,  NOW(), NOW()),
+(33, 'DEZ_ANOS',     8, 4,  NOW(), NOW()),
+(33, 'G',            8, 2,  NOW(), NOW()),
+(33, 'GG',           8, 1,  NOW(), NOW());
+
+-- ---- Coleção Natal (muitas variantes — tema natalino) ----
+
+-- Produto 34: Natal Bebê — 3 variantes
+INSERT INTO pijamavariante (pijama_id, tamanho, cor_id, estoque, datacadastro, dataalteracao) VALUES
+(34, 'RN', 8,  10, NOW(), NOW()),
+(34, 'P',  8,  8,  NOW(), NOW()),
+(34, 'M',  8,  5,  NOW(), NOW());
+
+-- Produto 35: Natal Infantil — 6 variantes
+INSERT INTO pijamavariante (pijama_id, tamanho, cor_id, estoque, datacadastro, dataalteracao) VALUES
+(35, 'UM_ANO',      8, 12, NOW(), NOW()),
+(35, 'DOIS_ANOS',   8, 9,  NOW(), NOW()),
+(35, 'QUATRO_ANOS', 8, 15, NOW(), NOW()),
+(35, 'SEIS_ANOS',   8, 7,  NOW(), NOW()),
+(35, 'OITO_ANOS',   8, 3,  NOW(), NOW()),
+(35, 'DEZ_ANOS',    8, 1,  NOW(), NOW());
+
+-- Produto 36: Natal Família — 10 variantes (maior do catálogo)
+INSERT INTO pijamavariante (pijama_id, tamanho, cor_id, estoque, datacadastro, dataalteracao) VALUES
+(36, 'RN',           8, 6,  NOW(), NOW()),
+(36, 'P',            8, 9,  NOW(), NOW()),
+(36, 'M',            8, 12, NOW(), NOW()),
+(36, 'G',            8, 10, NOW(), NOW()),
+(36, 'GG',           8, 7,  NOW(), NOW()),
+(36, 'UM_ANO',       8, 14, NOW(), NOW()),
+(36, 'DOIS_ANOS',    8, 11, NOW(), NOW()),
+(36, 'QUATRO_ANOS',  8, 8,  NOW(), NOW()),
+(36, 'SEIS_ANOS',    8, 5,  NOW(), NOW()),
+(36, 'DEZ_ANOS',     8, 0,  NOW(), NOW());  -- estoque 0
 
 -- ============================================================
--- 19. PIJAMAS ADICIONAIS (IDs 28–29)
--- Cobrem tamanhos UM_ANO, GG, XG, DEZESSEIS_ANOS
+-- PEDIDOS
+-- status: 1=Aguardando Pagamento 2=Pago 3=Em Separação 4=Enviado 5=Entregue 6=Cancelado
+-- forma_pagamento: 1=Pix 2=Boleto 3=Cartão Crédito 4=Cartão Débito
 -- ============================================================
 
--- 28 Body 1 Ano — cobre UM_ANO
-INSERT INTO pijama (nome, descricao, preco, modelo, ativo, sexo, categoria_id, marca_id, estampa_id)
-VALUES ('Body 1 Ano Estrelado',
-        'Body em algodão para bebê de 1 ano, com estampas de estrelas delicadas',
-        54.90, 'Body', true, 3, 3, 3, 3);
+INSERT INTO pedido (id, data, total, valor_desconto, status, forma_pagamento, cliente_id, cupom_id,
+  entrega_logradouro, entrega_numero, entrega_complemento, entrega_bairro, entrega_cep, entrega_municipio, entrega_estado, entrega_principal,
+  datacadastro, dataalteracao) VALUES
 
--- 29 Pijama Juvenil Plus — cobre GG, XG, DEZESSEIS_ANOS
-INSERT INTO pijama (nome, descricao, preco, modelo, ativo, sexo, categoria_id, marca_id, estampa_id)
-VALUES ('Pijama Juvenil Plus',
-        'Pijama manga longa em malha para tamanhos grandes e adolescentes',
-        84.90, 'Manga Longa', true, 2, 2, 2, 4);
+-- Pedido 1: Entregue — Ana, Pix, com cupom BEMVINDO10
+(1,  '2025-10-15 10:30:00', 134.82, 14.98, 5, 1, 1, 1,
+  'Quadra 103 Sul Rua SE 03', '15', 'Apto 202', 'Plano Diretor Sul', '77020-014', 'Palmas', 'Tocantins', true,
+  NOW(), NOW()),
+
+-- Pedido 2: Enviado — Bruno, Cartão Crédito, sem cupom
+(2,  '2025-11-20 14:15:00', 159.90, NULL, 4, 3, 2, NULL,
+  'Rua das Flores', '200', NULL, 'Jardim Paulista', '01310-000', 'São Paulo', 'São Paulo', true,
+  NOW(), NOW()),
+
+-- Pedido 3: Em Separação — Carla, Pix, cupom NATAL15
+(3,  '2025-12-01 09:00:00', 228.82, 40.40, 3, 1, 3, 2,
+  'Av. Afonso Pena', '500', 'Sala 10', 'Centro', '30130-001', 'Belo Horizonte', 'Minas Gerais', true,
+  NOW(), NOW()),
+
+-- Pedido 4: Pago — Daniel, Boleto, cupom FAMILIA20
+(4,  '2025-12-05 16:45:00', 239.84, 59.96, 2, 2, 4, 3,
+  'Rua da Praia', '77', 'Casa', 'Copacabana', '22070-011', 'Rio de Janeiro', 'Rio de Janeiro', true,
+  NOW(), NOW()),
+
+-- Pedido 5: Aguardando Pagamento — Ana, Pix, sem cupom
+(5,  '2025-12-10 11:20:00', 89.90, NULL, 1, 1, 1, NULL,
+  'Quadra 103 Sul Rua SE 03', '15', 'Apto 202', 'Plano Diretor Sul', '77020-014', 'Palmas', 'Tocantins', true,
+  NOW(), NOW()),
+
+-- Pedido 6: Cancelado — Bruno, Débito, sem cupom
+(6,  '2025-11-28 08:00:00', 79.90, NULL, 6, 4, 2, NULL,
+  'Rua das Flores', '200', NULL, 'Jardim Paulista', '01310-000', 'São Paulo', 'São Paulo', true,
+  NOW(), NOW());
 
 -- ============================================================
--- 20. PIJAMA × MATERIAL (pijamas 28–29)
+-- ITENS DE PEDIDO
+-- variante_id referencia pijamavariante.id
+-- Os IDs de variante abaixo são baseados na ordem de inserção acima:
+--   var 1-3 = produto 1 (RN,P,M) | var 4 = produto 4 (RN sem cor)
+--   var 5-8 = produto 5 | var 9-12 = produto 6 | etc.
+-- Usamos pijama_id + variante_id + preço coerente com a tabela pijama
 -- ============================================================
-INSERT INTO pijama_material (pijama_id, material_id) VALUES (28, 1); -- Body 1 Ano     → Algodão
-INSERT INTO pijama_material (pijama_id, material_id) VALUES (29, 2); -- Juvenil Plus   → Malha
+
+-- Pedido 1 (total 134.82 com 10% desc de 14.98 → subtotal bruto 149.80)
+INSERT INTO itempedido (pedido_id, pijama_id, variante_id, quantidade, preco_unitario, subtotal, datacadastro, dataalteracao) VALUES
+(1, 11, (SELECT id FROM pijamavariante WHERE pijama_id=11 AND tamanho='QUATRO_ANOS' LIMIT 1), 1, 79.90, 79.90, NOW(), NOW()),
+(1, 16, (SELECT id FROM pijamavariante WHERE pijama_id=16 AND tamanho='DOIS_ANOS'   LIMIT 1), 1, 74.90, 74.90, NOW(), NOW());
+
+-- Pedido 2 (total 159.90, sem desconto)
+INSERT INTO itempedido (pedido_id, pijama_id, variante_id, quantidade, preco_unitario, subtotal, datacadastro, dataalteracao) VALUES
+(2, 32, (SELECT id FROM pijamavariante WHERE pijama_id=32 AND tamanho='G' LIMIT 1), 1, 159.90, 159.90, NOW(), NOW());
+
+-- Pedido 3 (total 228.82 com 15% desc 40.40 → bruto 269.22 ≈ arredondado)
+INSERT INTO itempedido (pedido_id, pijama_id, variante_id, quantidade, preco_unitario, subtotal, datacadastro, dataalteracao) VALUES
+(3, 35, (SELECT id FROM pijamavariante WHERE pijama_id=35 AND tamanho='QUATRO_ANOS' LIMIT 1), 1, 89.90,  89.90,  NOW(), NOW()),
+(3, 36, (SELECT id FROM pijamavariante WHERE pijama_id=36 AND tamanho='G'           LIMIT 1), 1, 149.90, 149.90, NOW(), NOW());
+
+-- Pedido 4 (total 239.84 com 20% desc 59.96 → bruto 299.80)
+INSERT INTO itempedido (pedido_id, pijama_id, variante_id, quantidade, preco_unitario, subtotal, datacadastro, dataalteracao) VALUES
+(4, 31, (SELECT id FROM pijamavariante WHERE pijama_id=31 AND tamanho='M'  LIMIT 1), 1, 149.90, 149.90, NOW(), NOW()),
+(4, 33, (SELECT id FROM pijamavariante WHERE pijama_id=33 AND tamanho='GG' LIMIT 1), 1, 149.90, 149.90, NOW(), NOW());
+
+-- Pedido 5 (total 89.90, sem desconto)
+INSERT INTO itempedido (pedido_id, pijama_id, variante_id, quantidade, preco_unitario, subtotal, datacadastro, dataalteracao) VALUES
+(5, 35, (SELECT id FROM pijamavariante WHERE pijama_id=35 AND tamanho='SEIS_ANOS' LIMIT 1), 1, 89.90, 89.90, NOW(), NOW());
+
+-- Pedido 6 (cancelado — 1 item)
+INSERT INTO itempedido (pedido_id, pijama_id, variante_id, quantidade, preco_unitario, subtotal, datacadastro, dataalteracao) VALUES
+(6, 12, (SELECT id FROM pijamavariante WHERE pijama_id=12 AND tamanho='SEIS_ANOS' LIMIT 1), 1, 74.90, 74.90, NOW(), NOW());
 
 -- ============================================================
--- 21. PIJAMA × VARIANTE (pijamas 28–29)
+-- LISTA DE DESEJOS
 -- ============================================================
+INSERT INTO listadesejos (id, data_criacao, cliente_id, datacadastro, dataalteracao) VALUES
+(1, '2025-10-01', 1, NOW(), NOW()),
+(2, '2025-11-05', 2, NOW(), NOW()),
+(3, '2025-12-01', 3, NOW(), NOW());
 
--- Pijama 28 — Body 1 Ano (UM_ANO, Rosa=1 e Azul=2)
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (28, 'UM_ANO', 1, 15);
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (28, 'UM_ANO', 2, 12);
+INSERT INTO lista_desejos_pijama (lista_desejos_id, pijama_id) VALUES
+(1, 11),(1, 15),(1, 31),
+(2, 22),(2, 27),(2, 36),
+(3, 35),(3, 32),(3, 16);
 
--- Pijama 29 — Juvenil Plus (GG, XG, DEZESSEIS_ANOS, Azul=2 e Branco=4)
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (29, 'GG',             2, 12);
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (29, 'XG',             2,  8);
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (29, 'DEZESSEIS_ANOS', 2, 10);
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (29, 'GG',             4,  6);
-INSERT INTO pijama_variante (pijama_id, tamanho, cor_id, estoque) VALUES (29, 'XG',             4,  4);

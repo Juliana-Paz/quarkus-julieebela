@@ -1,10 +1,10 @@
 package br.unitins.tp2.resource;
 
 import java.net.URI;
-import java.util.List;
 
 import br.unitins.tp2.dto.CategoriaDTO;
 import br.unitins.tp2.dto.CategoriaResponseDTO;
+import br.unitins.tp2.dto.PagedResponseDTO;
 import br.unitins.tp2.service.CategoriaService;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
@@ -34,17 +34,12 @@ public class CategoriaResource {
     CategoriaService service;
 
     @GET
-    public Response buscarTodos(@QueryParam("page") @DefaultValue("0") int page,
-                                @QueryParam("pageSize") @DefaultValue("20") int pageSize) {
+    public PagedResponseDTO<CategoriaResponseDTO> buscarTodos(
+            @QueryParam("page") @DefaultValue("0") int page,
+            @QueryParam("size") @DefaultValue("25") int size) {
         page = Math.max(0, page);
-        pageSize = Math.min(Math.max(1, pageSize), MAX_PAGE_SIZE);
-
-        List<CategoriaResponseDTO> lista = service.findAll(page, pageSize);
-        return Response.ok(lista)
-                .header("X-Page", page)
-                .header("X-Page-Size", pageSize)
-                .header("X-Total-Count", service.count())
-                .build();
+        size = Math.min(Math.max(1, size), MAX_PAGE_SIZE);
+        return new PagedResponseDTO<>(service.findAll(page, size), service.count(), page, size);
     }
 
     @GET

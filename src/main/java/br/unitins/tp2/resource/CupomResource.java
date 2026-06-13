@@ -4,6 +4,7 @@ import java.net.URI;
 
 import br.unitins.tp2.dto.CupomDTO;
 import br.unitins.tp2.dto.CupomResponseDTO;
+import br.unitins.tp2.dto.PagedResponseDTO;
 import br.unitins.tp2.service.CupomService;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
@@ -33,16 +34,12 @@ public class CupomResource {
     CupomService service;
 
     @GET
-    public Response buscarTodos(@QueryParam("page") @DefaultValue("0") int page,
-                                @QueryParam("pageSize") @DefaultValue("20") int pageSize) {
+    public PagedResponseDTO<CupomResponseDTO> buscarTodos(
+            @QueryParam("page") @DefaultValue("0") int page,
+            @QueryParam("size") @DefaultValue("25") int size) {
         page = Math.max(0, page);
-        pageSize = Math.min(Math.max(1, pageSize), MAX_PAGE_SIZE);
-
-        return Response.ok(service.findAll(page, pageSize))
-                .header("X-Page", page)
-                .header("X-Page-Size", pageSize)
-                .header("X-Total-Count", service.count())
-                .build();
+        size = Math.min(Math.max(1, size), MAX_PAGE_SIZE);
+        return new PagedResponseDTO<>(service.findAll(page, size), service.count(), page, size);
     }
 
     @GET
