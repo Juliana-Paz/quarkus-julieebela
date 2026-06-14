@@ -55,9 +55,14 @@ public class PijamaResource {
     @GET
     public PagedResponseDTO<PijamaResponseDTO> buscarTodos(
             @QueryParam("page") @DefaultValue("0") int page,
-            @QueryParam("size") @DefaultValue("25") int size) {
+            @QueryParam("size") @DefaultValue("25") int size,
+            @QueryParam("nome") String nome) {
         page = Math.max(0, page);
         size = Math.min(Math.max(1, size), MAX_PAGE_SIZE);
+        if (nome != null && !nome.isBlank()) {
+            String termo = nome.trim();
+            return new PagedResponseDTO<>(service.findByNome(termo, page, size), service.countByNome(termo), page, size);
+        }
         return new PagedResponseDTO<>(service.findAll(page, size), service.count(), page, size);
     }
 
